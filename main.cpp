@@ -11,7 +11,15 @@ using namespace std;
 
 int main()
 {
-    Mat img0,img, img2;
+    Mat lastImage;//derière image chargé dans le projet -> celle que l'on va traiter
     cout<<"ca marche"<<endl;
-
+    lastImage = imread("data/detection_0200.jpeg", 1);
+    if(lastImage.empty() )
+    {
+        cout << "Couldn't open image "<<endl;
+        return 0;
+    }
+    namedWindow("org");
+    imshow("org",lastImage);
+    cvWaitKey();
 }
