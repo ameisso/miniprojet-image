@@ -1,24 +1,11 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
-<<<<<<< HEAD
-//#include "highgui.h"//pour les fader
-#include "opencv2/core/core.hpp"
-#include "opencv2/objdetect/objdetect.hpp"
-=======
->>>>>>> 1dcbd9796f147bdd7e64ef0fbbc42476f94269f6
 
 #include <cstdio>
 #include <iostream>
 
 using namespace cv;
 using namespace std;
-<<<<<<< HEAD
-
-int main()
-{
-    Mat img0,img, img2;
-    cout<<"ca marche"<<endl;
-=======
 //---------------------------------------------------------------------------------------------
 void tresh(double seuil);//binarise l'image
 void sub(Mat img1, Mat img2); //soustraire deux images
@@ -70,7 +57,8 @@ int main( int argc, char** argv )
         }
         if( (char)c == 's' || (char)c == ' ' )
         {
-            sub(img2,img);
+            open cv core 
+                    
         }
     }
 
@@ -83,10 +71,4 @@ void tresh (double seuil)
     threshold(img,imgTresh,seuil,255,THRESH_BINARY);//le seuil max est fixé ici à 255, mais o peut le changer
     imshow("binarize",imgTresh);
 }
-void sub(Mat img1, Mat img2)
-{
-    Mat sub;
-    cvAbsDiff(img1,img2,sub);
-    imshow("sub",sub);
->>>>>>> 1dcbd9796f147bdd7e64ef0fbbc42476f94269f6
-}
+
