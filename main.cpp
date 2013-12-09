@@ -9,7 +9,7 @@ using namespace std;
 //Variables
 int imageIndex=0; //index de l'image que l'on est en train de traiter.
 int studiedLine=100;//numéro de la ligne de matrice que l'on étudie
-int studiedLineWidth=10;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
+int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
 std::string path;//répertoire de travail
 //image de référence qui sert à extraire le fond...
 //pour le moment c'est toujours la même, ensuite, on pourra toujours la modifier avec les autres images.
