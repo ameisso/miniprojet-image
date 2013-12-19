@@ -2,7 +2,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include <cstdio>
 #include <iostream>
-
+#include "bloc.h"
 using namespace cv;
 using namespace std;
 //*************************************************************************
@@ -10,9 +10,9 @@ using namespace std;
 int imageIndex=0; //index de l'image que l'on est en train de traiter.
 int studiedLine=100;//numéro de la ligne de matrice que l'on étudie
 int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
-Size extractedLineNoBackgroundSize; //taille de la matrice que l'on utilise
-Mat mat;
+
 std::string path;//répertoire de travail
+Size extractedLineNoBackgroundSize;//taille de la matrice étudiée
 //image de référence qui sert à extraire le fond...
 //pour le moment c'est toujours la même, ensuite, on pourra toujours la modifier avec les autres images.
 Mat refImg=imread("data/detection_0000.jpeg");
@@ -20,6 +20,9 @@ Mat currentImg;//image que l'on est en train d'analyser
 Mat extractedLine;//ligne extraite de l'image courante.
 Mat backgroundLine; //correspond aux lignes de l'image de fond que l'on étudie.
 Mat extractedLineNoBackground;//matrice de l'image sans fond.
+CvCapture* capture;//pour brancher une caméra (j'ai fait un test pour voir si il n'y avait pas de problèmes de buffer...)
+Mat test=Mat::eye(4, 4, CV_64F);//matrice de test des blocs.
+//bloc theBloc;
 //*************************************************************************
 //Déclarations des fonctions
 bool checkIfNewImage(int lastImageIndex);
@@ -27,15 +30,13 @@ string toString(int val);
 void extractLine(Mat img,Mat &extractedLine,int lineNumber, int lineWidth);
 void substractBackground(Mat refImg, Mat CurrentImg, Mat &OutputImg);
 void CallBackFunc(int event, int x, int y, int flags, void* userdata);
+
 //*************************************************************************
 
 int main()
 {
 
-
-
-
-   //on vérifie que l'image de fond existe (benêt, benêt, benêt!!!)
+    //on vérifie que l'image de fond existe (benêt, benêt, benêt!!!)
     if(refImg.empty() )
     {
         cout << "Couldn't open background image "<<endl;
@@ -57,12 +58,16 @@ int main()
     imshow("image de fond",backgroundLine);
     while (1)
     {
+        int c = waitKey(1);
+        if( (char)c == 27 )//touche echap
+            break;
         if(checkIfNewImage(imageIndex))
         {
             currentImg=imread(path);
             extractLine(currentImg,extractedLine,studiedLine,studiedLineWidth);
             imshow("extractedLines",extractedLine);
             substractBackground(backgroundLine,extractedLine,extractedLineNoBackground);
+
             cvWaitKey(1);
 
             //cout<<toString(extractedLineNoBackgroundSize.width)<<endl;
@@ -108,6 +113,7 @@ bool checkIfNewImage(int lastImageIndex)
         return true;
     }
 }
+
 //Fonction qui retourne la valeur d'un INT sous forme de chaine de charactère.
 string toString(int val)
 {
@@ -139,8 +145,8 @@ void substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg)
 {
         Mat diff;
         absdiff(CurrentImg,refImg,OutputImg);
-        imshow("Image Without Background",OutputImg);
 
+        imshow("Image Without Background",OutputImg);
 }
 
 //Function qui detect le click du sourie et stoque les x et y
