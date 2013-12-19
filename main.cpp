@@ -10,6 +10,8 @@ using namespace std;
 int imageIndex=0; //index de l'image que l'on est en train de traiter.
 int studiedLine=100;//numéro de la ligne de matrice que l'on étudie
 int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
+Size extractedLineNoBackgroundSize; //taille de la matrice que l'on utilise
+Mat mat;
 std::string path;//répertoire de travail
 //image de référence qui sert à extraire le fond...
 //pour le moment c'est toujours la même, ensuite, on pourra toujours la modifier avec les autres images.
@@ -23,11 +25,17 @@ Mat extractedLineNoBackground;//matrice de l'image sans fond.
 bool checkIfNewImage(int lastImageIndex);
 string toString(int val);
 void extractLine(Mat img,Mat &extractedLine,int lineNumber, int lineWidth);
-void substractBackground(Mat refImg,Mat CurrentImg, Mat OutputImg);
+void substractBackground(Mat refImg, Mat CurrentImg, Mat &OutputImg);
+void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 //*************************************************************************
+
 int main()
 {
-    //on vérifie que l'image de fond existe (benêt, benêt, benêt!!!)
+
+
+
+
+   //on vérifie que l'image de fond existe (benêt, benêt, benêt!!!)
     if(refImg.empty() )
     {
         cout << "Couldn't open background image "<<endl;
@@ -35,7 +43,16 @@ int main()
     }
     imshow("image de fond",refImg);
     cvWaitKey(1000);//on affiche l'image de fond 1s pour vérifier
+
+  /*
+   namedWindow("My Window", 1);  //Creer une fenetre
+   setMouseCallback("My Window", CallBackFunc, NULL); //settter la function de callback pour tout eveniment du sourie
+   imshow("My Window", refIMG);//montre l'image
+   waitKey(0);//attends jusqu'a le user appuye
+   */
+
     //on extrait de l'image de fond les lignes qui nous intéresse (pour la soustraction).
+
     extractLine(refImg,backgroundLine,studiedLine,studiedLineWidth);
     imshow("image de fond",backgroundLine);
     while (1)
@@ -46,7 +63,16 @@ int main()
             extractLine(currentImg,extractedLine,studiedLine,studiedLineWidth);
             imshow("extractedLines",extractedLine);
             substractBackground(backgroundLine,extractedLine,extractedLineNoBackground);
-            cvWaitKey(5);
+            cvWaitKey(1);
+
+            //cout<<toString(extractedLineNoBackgroundSize.width)<<endl;
+            extractedLineNoBackgroundSize=extractedLineNoBackground.size();
+
+            for(int i=0; i<extractedLineNoBackgroundSize.width; i++)
+            {
+                cout<<(extractedLineNoBackground.at<bool>(0,1))<<endl;
+
+            }
             //Si on trouve une nouvelle image, on peut faire le traitement. c'est ici que ca commence.
             imageIndex++;
         }
@@ -90,6 +116,7 @@ string toString(int val)
     string str=ss.str();
     return str;
 }
+
 //Fonction qui extrait la ligne que l'on analyse  de l'image courante. ...
 //Dans la version deux, on pourra toujours appeller plusieure fois cette fonction pour extraire plusieures lignes.
 void extractLine(Mat img,Mat &extractedLine,int lineNumber, int lineWidth)
@@ -108,9 +135,20 @@ void extractLine(Mat img,Mat &extractedLine,int lineNumber, int lineWidth)
 }
 //Fonction qui soustrait le fond de l'image à l'image courante.
 //refImg est l'image de base (sans pietons que l'on a choisis au début.)
-void substractBackground(Mat refImg,Mat CurrentImg, Mat OutputImg)
+void substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg)
 {
         Mat diff;
         absdiff(CurrentImg,refImg,OutputImg);
         imshow("Image Without Background",OutputImg);
+
 }
+
+//Function qui detect le click du sourie et stoque les x et y
+void CallBackFunc(int event, int x, int y, int flags, void* userdata)
+{
+     if  ( event == EVENT_LBUTTONDOWN )
+     {
+          cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
+     }
+}
+
