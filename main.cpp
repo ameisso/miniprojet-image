@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <iostream>
 #include "bloc.h"
+#include "ligne.h"
 using namespace cv;
 using namespace std;
 //*************************************************************************
@@ -52,7 +53,14 @@ int main()
    waitKey(0);//attends jusqu'a le user appuye
    */
 
-    //on extrait de l'image de fond les lignes qui nous intéresse (pour la soustraction).
+
+
+  //  Ligne ligne1(Point(30, 200), Point(600, 180));
+  //  Ligne ligne1(Point(30, 200), Point(600, 200)); // droite y1=y2
+
+    //Ligne pour sur la rue
+    Ligne ligne1(Point(180, 300), Point(540, 200));
+    Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
 
     extractLine(refImg,backgroundLine,studiedLine,studiedLineWidth);
     imshow("image de fond",backgroundLine);
@@ -63,7 +71,26 @@ int main()
             break;
         if(checkIfNewImage(imageIndex))
         {
-            currentImg=imread(path);
+            currentImg = imread(path);
+            ligne1.extractFromImage(currentImg);
+
+            line(currentImg, ligne1.getP1(), ligne1.getP2(), Scalar(255, 0, 0));
+            imshow("Image", currentImg);
+
+            Mat data = ligne1.getData();
+            data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
+
+            // Afficher tous les x images -> c'est plus vite
+            if (imageIndex % 1 == 0)
+            {
+                imshow("montageImage", montageImage);
+            //    cout << data.cols << endl;
+                waitKey(4);
+            }
+
+
+
+/*
             extractLine(currentImg,extractedLine,studiedLine,studiedLineWidth);
             imshow("extractedLines",extractedLine);
             substractBackground(backgroundLine,extractedLine,extractedLineNoBackground);
@@ -78,10 +105,13 @@ int main()
                 cout<<(extractedLineNoBackground.at<bool>(0,1))<<endl;
 
             }
+*/
+
             //Si on trouve une nouvelle image, on peut faire le traitement. c'est ici que ca commence.
             imageIndex++;
         }
     }
+
 }
 
 

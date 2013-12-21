@@ -11,10 +11,13 @@ class Ligne
     Point P1, P2;
     Mat Data;
 public:
-    Ligne();
-    Ligne(Point P1, Point P2) : P1(P1), P2(P2) {}
+    Ligne() {}
 
-    Mat& getData() { return Data; }
+    Ligne(Point P1, Point P2);
+
+    const Mat& getData() { return Data; }
+    Point getP1() const { return P1; }
+    Point getP2() const { return P2; }
 
     void extractFromImage(Mat image);
 };
