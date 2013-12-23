@@ -22,12 +22,10 @@ void Ligne::extractFromImage(Mat image)
     LineIterator it(image, P1, P2, 4);
     Data = Mat(1, it.count, CV_8UC3);
 
-    for(int i = 0; i < it.count; i++, ++it)
+    for(int i = 0; i < it.count; i++, it++)
     {
         Data.at<Vec3b>(0, i) = image.at<Vec3b>(it.pos());
     }
 
-
     //Ici: Traitement de la ligne (Soustraction du fond. Blocs, etc)
-
 }
