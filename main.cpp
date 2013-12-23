@@ -60,7 +60,8 @@ int main()
 
     //Ligne pour sur la rue
     Ligne ligne1(Point(180, 300), Point(540, 200));
-    Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
+    //Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
+    Mat montageImage(600, 600, CV_8UC3);
 
     extractLine(refImg,backgroundLine,studiedLine,studiedLineWidth);
     imshow("image de fond",backgroundLine);
