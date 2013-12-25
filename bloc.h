@@ -18,8 +18,10 @@ public:
     int getNbFooters();
     void toString();
     bool checkDead();
-private:
+    void setDead(bool val);
     void deadBloc();
+private:
+
     int blocHeight; //hauteur du bloc (nombre d'images ou le bloc existe.
     int lastRightPos, lastLeftPos;//position droite et gauche du dernier bloc de pixels que l'on a ajouté au bloc.
     int nbFooters;//nombre de piétons dans le bloc (0 de base, mis a jour a l'appel de deadBloc)

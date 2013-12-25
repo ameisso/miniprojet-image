@@ -1,4 +1,4 @@
-#include "ligne.h"
+﻿#include "ligne.h"
 #include "bloc.h"
 #include <iostream>
 #include <vector>
@@ -15,9 +15,8 @@ Ligne::Ligne() : Ligne(Point(0,0), Point(0,0))
 
 Ligne::Ligne(Point P1, Point P2) : P1(P1), P2(P2)
 {
-    seuilR=40;
-    seuilG=1;
-    seuilB=1;
+    seuil=10;
+    tailleMiniBloc=5;
     //on ajoute un bloc par défaut, sinon l'itérateur ne tourne pas, il y a surement une meilleure facon de faire..mais pour essayer ca ira.
     bloc *defautBloc= new bloc(0,0);
     theBlocs.push_back(defautBloc);
@@ -58,29 +57,53 @@ void Ligne::substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg)
  * *************************************************/
 void Ligne::detectionDesBlocs(Mat imageSansFond)
 {
+    //cvtColor(imageSansFond,imageSansFond,CV_BGR2GRAY);
+    //adaptiveThreshold(imageSansFond,imageSansFond,1, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV,3, 230);
+    Mat grandeImageSansFond=imageSansFond;//aucun traitement sur cette matrice, ne sert qu'à l'affichage.
     int leftPos=0, rightPos=0; //Position extrème des pixels du bloc.
     bloc*currentBloc;
     bool ajoutBloc;//booléen qui teste si on a réussit a ajouter la ligne de pixels non noir a un bloc.
+    cout<<"-----------------------------------"<<endl;//nouvelle image
 
-    cout<<"***************************************************"<<endl;
-    int *ptrImageSansFond = (int*)(imageSansFond.data);
-    //on multiplie la matrice pour voir x* la même ligne pour y voir plus clair
-    Mat grandeImageSansFond;
-    for(int i=0; i<30;i++)
-        grandeImageSansFond.push_back(imageSansFond);
-    imshow("grandeImageSansFond",grandeImageSansFond);
+
+    //---->début du traitement
+    //on met tout le blocs qui existent déjà comme mort.
+    //Si on ajoute une ligne au bloc alors on lui enlève son status de mort, sinon on le supprime.
+    cout<<"theBlocks :"<<endl;
+    for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
+    {
+        (*it)->setDead(true);
+        (*it)->toString();    //affichage de touts les blocs du vecteur (pour vérif)
+    }
+    cout<<"*****************"<<endl;
     //on accède aux valeurs de pixels
+    bool debutSeuil=false;
     for(int i = 0;i < imageSansFond.cols;i++){
-        //cout<< i<<" :["<< toString((unsigned char)ptrImageSansFond[ i + 2])<<","<< toString((unsigned char)ptrImageSansFond[ i + 1])<<","<< toString((unsigned char)ptrImageSansFond[ i ])<<"]"<<endl;
         //détection du début du bloc.
-        if (((unsigned char)ptrImageSansFond[i+2]>seuilR)&&((unsigned char)ptrImageSansFond[i+1]>seuilG)&&((unsigned char)ptrImageSansFond[i]>seuilB))
+        Vec3b intensity = imageSansFond.at<Vec3b>(0, i);//pour gagner en temps on peut acceder à la matrice par pointeurs... il parait
+        uchar blue = intensity.val[0];
+        uchar green = intensity.val[1];
+        uchar red = intensity.val[2];
+        uchar intensite=(red+green+blue)/3;
+        //cout<<toString(intensite)<<",";
+
+
+        if ((intensite>seuil)&&(debutSeuil==false))
         {
-            //cout<<"seuil dépassé: "<< i<<" :["<< toString((unsigned char)ptrImageSansFond[ i + 2])<<","<< toString((unsigned char)ptrImageSansFond[ i + 1])<<","<< toString((unsigned char)ptrImageSansFond[ i ])<<"]"<<endl;
+            debutSeuil=true;
             leftPos=i;
         }
         //on détecte la fin du bloc
-        else if ((leftPos!=0)&&((unsigned char)ptrImageSansFond[i+2]<seuilR)&&((unsigned char)ptrImageSansFond[i+1]<seuilG)&&((unsigned char)ptrImageSansFond[i]<seuilB))
+        else if ((leftPos!=0) &&(intensite<seuil)&&( i-1-leftPos>tailleMiniBloc))
         {
+            debutSeuil=false;//permet la detection d'un nouveau seuil sur la même ligne
+            //affiche le début du bloc détecté en rouge
+            Vec3b &intensityd = grandeImageSansFond.at<Vec3b>(0, leftPos);
+            intensityd.val[2]=255;
+            //affiche la fin du bloc détecté en vert.
+            Vec3b &intensity = grandeImageSansFond.at<Vec3b>(0, i);
+            intensity.val[0]=255;
+            intensity.val[1]=255;
             rightPos=i-1;
             ajoutBloc=false;
             //cout<<i<<" ["<<leftPos<<","<<rightPos<<"] "<<(rightPos-leftPos)<<endl;
@@ -91,30 +114,35 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
                 {
                     //si on a réussis à ajouter la ligne à un bloc.
                     ajoutBloc=true;
-                    break;
+                    //break;
                 }
-                //(*it)->toString();
             }
             if(ajoutBloc==false)
             {
                 //si on a pas réussis a ajouter la ligne non noire à un bloc, on crée un nouveau bloc.
+                if(rightPos-leftPos>tailleMiniBloc)//on néglige les trop petits blocs.
+                {
                 currentBloc=new bloc(leftPos,rightPos);
                 theBlocs.push_back(currentBloc);
+                }
+
             }
-            //on fait le ménage dans les blocs (on supprime les blocs morts)
-            for(int i=0; i<theBlocs.size();i++)
-            {
-                if (theBlocs[i]->checkDead()==true)
-                    theBlocs.erase(theBlocs.begin()+i);
-            }
-            //si oui on l'ajoute, sinon, on crée un nouveaubloc.
             rightPos=0;
             leftPos=0;
         }
-
-        //TODO tester si la variation dépasse un certain seuil (en paramètre de l'objet Ligne ?)
-        //en fonction soit créer un objet soit ajouter les pixels au bloc.
     }
+    //on fait le ménage dans les blocs (on supprime les blocs morts)
+    for(int i=0; i<theBlocs.size();i++)
+    {
+        if (theBlocs[i]->checkDead()==true)
+        {
+            theBlocs[i]->deadBloc();
+            theBlocs.erase(theBlocs.begin()+i);
+        }
+    }
+    //on multiplie la matrice pour voir x* la même ligne pour y voir plus clair
+    for(int i=0; i<30;i++) grandeImageSansFond.push_back(imageSansFond);
+    imshow("grandeImageSansFond",grandeImageSansFond);
 }
 
 /**************************************************

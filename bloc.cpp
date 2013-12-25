@@ -6,24 +6,26 @@ bloc::bloc(int leftPos_, int rightPos_)
     lastRightPos=rightPos_;
     lastLeftPos=leftPos_;
     maxBlocWidth=lastRightPos-lastLeftPos;
-    cout<<"new bloc ["<<lastRightPos<<","<<lastLeftPos<<"] widht :"<<maxBlocWidth<<endl;
+    cout<<"new bloc ["<<lastLeftPos<<","<<lastRightPos<<"] widht :"<<maxBlocWidth<<endl;
     blocHeight=1;
-    dead=true;
+    dead=false;
 }
 
 //Fonction qui prend en paramètre les position des valeurs non noires de la matrice "extractedLineNoBackground" et qui vérifie si elle appartient a ce bloc.
 //elle retourne true si le bloc proposé appartient à ce bloc, false sinon.
 bool bloc::checkNewLine(int leftPos, int rightPos)
 {
-    if(((rightPos<=lastRightPos) && (rightPos>=lastLeftPos))||((leftPos>=lastLeftPos) && (leftPos <=lastRightPos)))
+    if(((rightPos<=lastRightPos) && (rightPos>=lastLeftPos))|((leftPos>=lastLeftPos) && (leftPos <=lastRightPos))|((leftPos<=lastLeftPos)&&(rightPos>lastRightPos)))
     {
-        cout<<"owned by this bloc"<<endl;//
+        cout<<leftPos<<","<<rightPos<<" owned by ["<<lastLeftPos<<","<<lastRightPos<<"] widht :"<<maxBlocWidth<<endl;
         blocHeight++;// on augmente le nombre de frames pour mesurer la longeur du bloc.(+1);
-        if (leftPos-rightPos>maxBlocWidth)
+        if (rightPos-leftPos>maxBlocWidth)
         {
-            maxBlocWidth=leftPos-rightPos;
+            maxBlocWidth=rightPos-leftPos;
             cout<<"MaxBlocWidth updated"<<endl;
         }
+        lastLeftPos=leftPos;
+        lastRightPos=rightPos;
         dead=false;//on a pu ajouter une ligne au bloc, donc il n'est pas mort.
         return true;
     }
@@ -37,7 +39,7 @@ void bloc::deadBloc()
 {
     int nbFooterInWidth=maxBlocWidth/footerWidth;
 
-    cout<<"pietons comptés dans ce bloc"<<nbFooterInWidth<<endl;
+    //cout<<"pietons comptés dans ce bloc"<<nbFooterInWidth<<endl;
     nbFooters=nbFooterInWidth;
 }
 int bloc::getNbFooters()
@@ -51,7 +53,11 @@ void bloc::toString()
 bool bloc::checkDead()
 {
     if (dead==true)
-        cout<<"bloc deleted ["<<lastRightPos<<","<<lastLeftPos<<"]"<<endl;
+        cout<<" deleted ["<<lastLeftPos<<","<<lastRightPos<<"]"<<endl;
     return dead;
+}
+void bloc::setDead(bool val)
+{
+    dead=val;
 }
 

@@ -57,6 +57,7 @@ int main()
     //Ligne pour sur la rue
     Point P1(180,300);
     Point P2(540,200);
+
     Ligne ligne1(P1, P2);
     //Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
     Mat montageImage(600, 600, CV_8UC3);
