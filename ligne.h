@@ -3,6 +3,7 @@
 
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "bloc.h"
 
 using namespace cv;
 
@@ -22,6 +23,9 @@ public:
     void substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg);
     void detectionDesBlocs(Mat imageSansFond);
     string toString(int val);
+private :
+    unsigned char seuilR,seuilG,seuilB;//valeurs au dessus desquelles on détecte un bloc.
+    vector<bloc*>theBlocs;//vecteur de pointeurs vers les blocs
 };
 
 #endif // LIGNE_H

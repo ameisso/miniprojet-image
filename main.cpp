@@ -1,5 +1,6 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/core/core.hpp"
 #include <cstdio>
 #include <iostream>
 #include "bloc.h"
@@ -8,6 +9,7 @@ using namespace cv;
 using namespace std;
 //*************************************************************************
 //Variables
+bool run=true;//si on appuie sur la touche r, on continue d'exectuter le programme, sinon, on l'arrete, ca permet de voir ce qui se passe dans les matrices.
 int imageIndex=0; //index de l'image que l'on est en train de traiter.
 int studiedLine=100;//numéro de la ligne de matrice que l'on étudie
 int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
@@ -61,33 +63,42 @@ int main()
 
     while (1)
     {
-        int c = waitKey(1);
+        int c = waitKey(60);
         if( (char)c == 27 )//touche echap
-            break;
-        if(checkIfNewImage(imageIndex))
         {
-            currentImg = imread(path);
-            ligne1.extractFromImage(currentImg,refImg);
-
-
-            line(currentImg, ligne1.getP1(), ligne1.getP2(), Scalar(255, 0, 0));
-            imshow("Image avec ligne", currentImg);
-
-            Mat data = ligne1.getData();
-            data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
-
-            // Afficher tous les x images -> c'est plus vite
-            if (imageIndex % 1 == 0)
+            break;
+        }
+        else if((char)c=='r')//touche R
+        {
+            cout<<"run"<<endl;
+            run=!run;
+        }
+        if (run)
+        {
+            if(checkIfNewImage(imageIndex))
             {
-                //imshow("data",data);
-                //imshow("montageImage", montageImage);
-                //cout << data.cols << endl;
-                waitKey(1);
+                currentImg = imread(path);
+                ligne1.extractFromImage(currentImg,refImg);
+
+
+                line(currentImg, ligne1.getP1(), ligne1.getP2(), Scalar(255, 0, 0));
+                imshow("Image avec ligne", currentImg);
+
+                Mat data = ligne1.getData();
+                data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
+
+                // Afficher tous les x images -> c'est plus vite
+                if (imageIndex % 1 == 0)
+                {
+                    //imshow("data",data);
+                    //imshow("montageImage", montageImage);
+                    //cout << data.cols << endl;
+                    waitKey(1);
+                }
+                imageIndex++;
             }
-            imageIndex++;
         }
     }
-
 }
 
 
@@ -128,26 +139,7 @@ string toString(int val)
     string str=ss.str();
     return str;
 }
-
-/*
-//Fonction qui extrait la ligne que l'on analyse  de l'image courante. ...
-//Dans la version deux, on pourra toujours appeller plusieure fois cette fonction pour extraire plusieures lignes.
-void extractLine(Mat img,Mat &extractedLine,int lineNumber, int lineWidth)
-{
-    if((lineNumber+lineWidth<img.rows)||(lineNumber+lineWidth<img.rows))
-    {
-        extractedLine=img.rowRange(lineNumber,lineNumber+lineWidth);
-    }
-    else
-    {
-        // si on essaye d'extraire une ligne de matrice qui n'existe pas dans la matrice d'origine
-        //on affiche un message d'erreur et on attend 1000ms.
-        cout<<"Line to extract out of bound, max line is :"<<img.rows<<endl;
-        cvWaitKey(1000);
-    }
-}
-*/
-//Function qui detect le click du sourie et stoque les x et y
+//Function qui detecte le click du sourie et stoque les x et y
 void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
      if  ( event == EVENT_LBUTTONDOWN )
