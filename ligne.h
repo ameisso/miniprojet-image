@@ -18,15 +18,15 @@ public:
     Point getP1() const { return P1; }
     Point getP2() const { return P2; }
     const Mat& getData() const { return Data; }
-
     void extractFromImage(Mat image, Mat background);
-    void substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg);
-    void detectionDesBlocs(Mat imageSansFond);
-    string toString(int val);
 private :
     unsigned char seuil;//valeurs au dessus desquelles on détecte un bloc.
     int tailleMiniBloc;//taille en dessous de laquelle on analyse pas le bloc.
     vector<bloc*>theBlocs;//vecteur de pointeurs vers les blocs
+    void substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg);
+    void detectionDesBlocs(Mat imageSansFond);
+    string toString(int val);
+    void cleanTheBlocs();
 };
 
 #endif // LIGNE_H

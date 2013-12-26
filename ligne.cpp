@@ -38,6 +38,8 @@ void Ligne::extractFromImage(Mat image, Mat background)
     substractBackground(Bgr,Data,Data);//on soustrait le fond et on écrit dans data.
     //Detection des blocs
     detectionDesBlocs(Data);
+    //supression des blocs vides
+    cleanTheBlocs();
     //Ici: Traitement de la ligne (Soustraction du fond. Blocs, etc)
 }
 /**************************************************
@@ -63,19 +65,19 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
     int leftPos=0, rightPos=0; //Position extrème des pixels du bloc.
     bloc*currentBloc;
     bool ajoutBloc;//booléen qui teste si on a réussit a ajouter la ligne de pixels non noir a un bloc.
-    cout<<"-----------------------------------"<<endl;//nouvelle image
+    //cout<<"-----------------------------------"<<endl;//nouvelle image
 
 
     //---->début du traitement
     //on met tout le blocs qui existent déjà comme mort.
     //Si on ajoute une ligne au bloc alors on lui enlève son status de mort, sinon on le supprime.
-    cout<<"theBlocks :"<<endl;
+    //cout<<"theBlocks :"<<endl;
     for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
     {
         (*it)->setDead(true);
-        (*it)->toString();    //affichage de touts les blocs du vecteur (pour vérif)
+        //(*it)->toString();    //affichage de touts les blocs du vecteur (pour vérif)
     }
-    cout<<"*****************"<<endl;
+    //cout<<"*****************"<<endl;
     //on accède aux valeurs de pixels
     bool debutSeuil=false;
     for(int i = 0;i < imageSansFond.cols;i++){
@@ -131,7 +133,15 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
             leftPos=0;
         }
     }
-    //on fait le ménage dans les blocs (on supprime les blocs morts)
+
+    //on multiplie la matrice pour voir x* la même ligne pour y voir plus clair
+    for(int i=0; i<30;i++) grandeImageSansFond.push_back(imageSansFond);
+    imshow("grandeImageSansFond",grandeImageSansFond);
+}
+//on fait le ménage dans les blocs (on supprime les blocs morts)
+void Ligne::cleanTheBlocs()
+{
+
     for(int i=0; i<theBlocs.size();i++)
     {
         if (theBlocs[i]->checkDead()==true)
@@ -139,11 +149,20 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
             theBlocs[i]->deadBloc();
             theBlocs.erase(theBlocs.begin()+i);
         }
+        else//si le bloc est pas mort, on vérifie qu'il n'existe pas un autre bloc avec les même paramètre
+        {
+            for (int j=i+1; j<theBlocs.size();j++)
+            {
+                if(theBlocs[i]->checkDuplicate  (theBlocs[j]));
+                {
+                theBlocs[j]->deadBloc();
+                theBlocs.erase(theBlocs.begin()+j);
+                }
+            }
+        }
     }
-    //on multiplie la matrice pour voir x* la même ligne pour y voir plus clair
-    for(int i=0; i<30;i++) grandeImageSansFond.push_back(imageSansFond);
-    imshow("grandeImageSansFond",grandeImageSansFond);
 }
+
 
 /**************************************************
 Fonction qui convertie un int en string.
@@ -155,3 +174,4 @@ string Ligne::toString(int val)
     string str=ss.str();
     return str;
 }
+

@@ -7,7 +7,7 @@
 using namespace cv;
 using namespace std;
 
-#define footerWidth 10//largeur en pixel d'un piéton
+#define footerWidth 28//largeur en pixel d'un piéton
 #define footerHeight 20//"hauteur en pixels d'un piéton
 class bloc
 {
@@ -20,6 +20,8 @@ public:
     bool checkDead();
     void setDead(bool val);
     void deadBloc();
+    bool checkDuplicate  (bloc *testedBloc);
+    int max(int i1,int i2);
 private:
 
     int blocHeight; //hauteur du bloc (nombre d'images ou le bloc existe.
