@@ -20,9 +20,12 @@ Ligne::Ligne(Point P1, Point P2) : P1(P1), P2(P2)
 
     seuil=10;
     tailleMiniBloc=5;
+
+/*  ---> On a plus besoin de ca?
     //on ajoute un bloc par défaut, sinon l'itérateur ne tourne pas, il y a surement une meilleure facon de faire..mais pour essayer ca ira.
     bloc *defautBloc = new bloc(0,0, footerWidth, footerHeight);
     theBlocs.push_back(defautBloc);
+*/
 }
 
 // Pour changer la taille d'un pieton, il faut iterer dans tous les blocs
@@ -177,17 +180,5 @@ void Ligne::cleanTheBlocs()
             }
         }
     }
-}
-
-
-/**************************************************
-Fonction qui convertie un int en string.
- * *************************************************/
-string Ligne::toString(int val)
-{
-    stringstream ss;
-    ss<<val;
-    string str=ss.str();
-    return str;
 }
 

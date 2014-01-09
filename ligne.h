@@ -37,7 +37,6 @@ public:
 private:
     void substractBackground(Mat refImg, Mat CurrentImg, Mat &OutputImg);
     void detectionDesBlocs(Mat imageSansFond);
-    string toString(int val);
     void cleanTheBlocs();
 };
 
