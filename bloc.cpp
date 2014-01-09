@@ -1,12 +1,15 @@
 #include "bloc.h"
 
 
-bloc::bloc(int leftPos_, int rightPos_)
+bloc::bloc(int leftPos_, int rightPos_, int footerWidth_, int footerHeight_)
 {
-    lastRightPos=rightPos_;
-    lastLeftPos=leftPos_;
+    lastRightPos = rightPos_;
+    lastLeftPos = leftPos_;
+    footerWidth = footerWidth_;
+    footerHeight = footerHeight_;
+
     maxBlocWidth=lastRightPos-lastLeftPos;
-    //cout<<"new bloc ["<<lastLeftPos<<","<<lastRightPos<<"] widht :"<<maxBlocWidth<<endl;
+   // cout<<"new bloc ["<<lastLeftPos<<","<<lastRightPos<<"] widht :"<<maxBlocWidth<<endl;
     blocHeight=1;
     dead=false;
 }
@@ -34,7 +37,7 @@ bool bloc::checkNewLine(int leftPos, int rightPos)
         return false;
     }
 }
-//Fonction qui calcule le nombre de personnes dans le bloc et incrémente le compteur.
+//Fonction qui calcule le nombre de personnes dans le bloc et incrémente le ur.
 void bloc::deadBloc()
 {
     int nbFooterInWidth=maxBlocWidth/footerWidth;
@@ -77,16 +80,8 @@ bool bloc::checkDuplicate  (bloc *testedBloc)
     {
         //cout<<"equivalent bloc found ["<<lastLeftPos<<","<<lastRightPos<<"]"<<endl;
         //on copie les plus grandes valeurs dans ce bloc.
-        maxBlocWidth=max(maxBlocWidth,testedBloc->maxBlocWidth);
-        blocHeight=max(blocHeight,testedBloc->blocHeight);
+        maxBlocWidth=max<int>(maxBlocWidth,testedBloc->maxBlocWidth);
+        blocHeight=max<int>(blocHeight,testedBloc->blocHeight);
         return true;
     }
 }
-/**************************************************
-Fonction qui renvoie la plus grande valeur
- * *************************************************/
-int bloc::max(int i1,int i2)
-{
-    return ((i1>i2)?i1:i2);
-}
-
