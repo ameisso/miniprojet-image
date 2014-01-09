@@ -1,9 +1,11 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/core/core.hpp"
 #include <cstdio>
 #include <iostream>
 #include <vector>
 #include "bloc.h"
+#include "ligne.h"
 
 using namespace cv;
 using namespace std;
@@ -17,6 +19,7 @@ typedef enum mouseState {
 
 //*************************************************************************
 //Variables
+bool run=true;//si on appuie sur la touche r, on continue d'exectuter le programme, sinon, on l'arrete, ca permet de voir ce qui se passe dans les matrices.
 int imageIndex=0; //index de l'image que l'on est en train de traiter.
 int studiedLine=100;//numéro de la ligne de matrice que l'on étudie
 int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
@@ -32,9 +35,6 @@ Mat currentImg;//image que l'on est en train d'analyser
 Mat extractedLine;//ligne extraite de l'image courante.
 Mat backgroundLine; //correspond aux lignes de l'image de fond que l'on étudie.
 Mat extractedLineNoBackground;//matrice de l'image sans fond.
-CvCapture* capture;//pour brancher une caméra (j'ai fait un test pour voir si il n'y avait pas de problèmes de buffer...)
-Mat test=Mat::eye(4, 4, CV_64F);//matrice de test des blocs.
-//bloc theBloc;
 //*************************************************************************
 //Déclarations des fonctions
 bool checkIfNewImage(int lastImageIndex);
@@ -54,8 +54,8 @@ int main()
         cout << "Couldn't open background image "<<endl;
         return false;
     }
-    imshow("image de fond",refImg);
-    cvWaitKey(1000);//on affiche l'image de fond 1s pour vérifier
+    //imshow("image de fond",refImg);
+    //cvWaitKey(1000);//on affiche l'image de fond 1s pour vérifier
 
   /*
    namedWindow("My Window", 1);  //Creer une fenetre
@@ -63,35 +63,53 @@ int main()
    imshow("My Window", refIMG);//montre l'image
    waitKey(0);//attends jusqu'a le user appuye
    */
+  //  Ligne ligne1(Point(30, 200), Point(600, 180));
+  //  Ligne ligne1(Point(30, 200), Point(600, 200)); // droite y1=y2
 
-    //on extrait de l'image de fond les lignes qui nous intéresse (pour la soustraction).
+    //Ligne pour sur la rue
+    Point P1(180,300);
+    Point P2(540,200);
 
-    extractLine(refImg,backgroundLine,studiedLine,studiedLineWidth);
-    imshow("image de fond",backgroundLine);
+    Ligne ligne1(P1, P2);
+    //Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
+    Mat montageImage(600, 600, CV_8UC3);
+
     while (1)
     {
-        int c = waitKey(1);
+        int c = waitKey(60);
         if( (char)c == 27 )//touche echap
-            break;
-        if(checkIfNewImage(imageIndex))
         {
-            currentImg=imread(path);
-            extractLine(currentImg,extractedLine,studiedLine,studiedLineWidth);
-            imshow("extractedLines",extractedLine);
-            substractBackground(backgroundLine,extractedLine,extractedLineNoBackground);
-
-            cvWaitKey(1);
-
-            //cout<<toString(extractedLineNoBackgroundSize.width)<<endl;
-            extractedLineNoBackgroundSize=extractedLineNoBackground.size();
-
-            for(int i=0; i<extractedLineNoBackgroundSize.width; i++)
+            break;
+        }
+        else if((char)c=='r')//touche R
+        {
+            cout<<"run"<<endl;
+            run=!run;
+        }
+        if (run)
+        {
+            if(checkIfNewImage(imageIndex))
             {
-                cout<<(extractedLineNoBackground.at<bool>(0,1))<<endl;
+                currentImg = imread(path);
+                ligne1.extractFromImage(currentImg,refImg);
 
+
+                line(currentImg, ligne1.getP1(), ligne1.getP2(), Scalar(255, 0, 0));
+                imshow("Image avec ligne", currentImg);
+
+                Mat data = ligne1.getData();
+                data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
+
+                // Afficher tous les x images -> c'est plus vite
+                if (imageIndex % 1 == 0)
+                {
+                    //imshow("data",data);
+                    //imshow("montageImage", montageImage);
+                    //cout << data.cols << endl;
+                    waitKey(1);
+                }
+                imageIndex++;
             }
-            //Si on trouve une nouvelle image, on peut faire le traitement. c'est ici que ca commence.
-            imageIndex++;
         }
     }
 }
@@ -134,34 +152,7 @@ string toString(int val)
     string str=ss.str();
     return str;
 }
-
-//Fonction qui extrait la ligne que l'on analyse  de l'image courante. ...
-//Dans la version deux, on pourra toujours appeller plusieure fois cette fonction pour extraire plusieures lignes.
-void extractLine(Mat img,Mat &extractedLine,int lineNumber, int lineWidth)
-{
-    if((lineNumber+lineWidth<img.rows)||(lineNumber+lineWidth<img.rows))
-    {
-        extractedLine=img.rowRange(lineNumber,lineNumber+lineWidth);
-    }
-    else
-    {
-        // si on essaye d'extraire une ligne de matrice qui n'existe pas dans la matrice d'origine
-        //on affiche un message d'erreur et on attend 1000ms.
-        cout<<"Line to extract out of bound, max line is :"<<img.rows<<endl;
-        cvWaitKey(1000);
-    }
-}
-//Fonction qui soustrait le fond de l'image à l'image courante.
-//refImg est l'image de base (sans pietons que l'on a choisis au début.)
-void substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg)
-{
-        Mat diff;
-        absdiff(CurrentImg,refImg,OutputImg);
-
-        imshow("Image Without Background",OutputImg);
-}
-
-//Function qui detect le click du sourie et stoque les x et y
+//Function qui detecte le click du sourie et stoque les x et y
 void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
     if( event == EVENT_RBUTTONDOWN )
