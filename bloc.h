@@ -19,8 +19,14 @@ private:
     int nbFooters;//nombre de piétons dans le bloc (0 de base, mis a jour a l'appel de deadBloc)
     int maxBlocWidth;
     bool dead;//true si le bloc est mort.
+
+    // ici on stocke les lignes -> finallement c'est sont X pietons
+    Mat matriceFooters;
+    int matriceFootersLeftPos; // le position dans l'image originale
+    int matriceFootersRightPos;
 public:
-    bloc(int leftPos_, int rightPos_, int footerWidth_, int footerHeight_);
+    bloc(int leftPos_, int rightPos_, int footerWidth_, int footerHeight_, Mat matriceFooters_, int matriceFootersLeftPos_,
+         int matriceFootersRightPos_);
 
     void setfooterWidth(int width) { footerWidth = width; }
     void setfooterHeight(int height) { footerHeight = height; }
@@ -32,6 +38,9 @@ public:
     void setDead(bool val);
     void deadBloc();
     bool checkDuplicate(bloc *testedBloc);
+
+    // Ajouter une ligne a la matriceFooters
+    void pushBackToMatriceFooters(Mat mat, int leftPos, int rightPos);
 };
 
 #endif // BLOC_H

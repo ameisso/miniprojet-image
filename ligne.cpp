@@ -136,6 +136,10 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
                     //si on a réussis à ajouter la ligne à un bloc.
                     ajoutBloc=true;
                     //break;
+
+                    Mat mat = Mat(0, rightPos - leftPos, CV_8UC3);
+                    mat.push_back(Data.row(0).colRange(leftPos, rightPos));
+                    (*it)->pushBackToMatriceFooters(mat, leftPos, rightPos); //passer leftPos et comparer avec bloc::leftPos et corriger la position!!!
                 }
             }
             if(ajoutBloc==false)
@@ -143,7 +147,11 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
                 //si on a pas réussis a ajouter la ligne non noire à un bloc, on crée un nouveau bloc.
                 if(rightPos-leftPos>tailleMiniBloc)//on néglige les trop petits blocs.
                 {
-                    currentBloc=new bloc(leftPos,rightPos, footerWidth, footerHeight);
+                    //On ajoute au nouveau bloc aussi une matrice
+                    Mat mat = Mat(0, rightPos - leftPos, CV_8UC3);
+                    mat.push_back(Data.row(0).colRange(leftPos, rightPos));
+
+                    currentBloc = new bloc(leftPos,rightPos, footerWidth, footerHeight, mat, leftPos, rightPos);
                     theBlocs.push_back(currentBloc);
                 }
 
