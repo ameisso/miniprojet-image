@@ -15,11 +15,27 @@ Ligne::Ligne() : Ligne(Point(0,0), Point(0,0))
 
 Ligne::Ligne(Point P1, Point P2) : P1(P1), P2(P2)
 {
+    footerWidth = 28;
+    footerHeight = 20;
+
     seuil=10;
     tailleMiniBloc=5;
     //on ajoute un bloc par défaut, sinon l'itérateur ne tourne pas, il y a surement une meilleure facon de faire..mais pour essayer ca ira.
-    bloc *defautBloc= new bloc(0,0);
+    bloc *defautBloc = new bloc(0,0, footerWidth, footerHeight);
     theBlocs.push_back(defautBloc);
+}
+
+// Pour changer la taille d'un pieton, il faut iterer dans tous les blocs
+void Ligne::setfooterWidth(int width)
+{
+    for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
+        (*it)->setfooterWidth(width);
+}
+
+void Ligne::setfooterHeight(int height)
+{
+    for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
+        (*it)->setfooterHeight(height);
 }
 
 // Extraire une ligne d'image d'origine et stocker dans Data
@@ -90,7 +106,7 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
         //cout<<toString(intensite)<<",";
 
 
-        if ((intensite>seuil)&&(debutSeuil==false))
+        if ((intensite>seuil)&&(!debutSeuil))
         {
             debutSeuil=true;
             leftPos=i;
@@ -112,7 +128,7 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
             //on vérifie dans le vecteur des blocs si on peut ajouter ce bloc.
             for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
             {
-                if((*it)->checkNewLine(leftPos,rightPos)==true)
+                if((*it)->checkNewLine(leftPos,rightPos))
                 {
                     //si on a réussis à ajouter la ligne à un bloc.
                     ajoutBloc=true;
@@ -124,8 +140,8 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
                 //si on a pas réussis a ajouter la ligne non noire à un bloc, on crée un nouveau bloc.
                 if(rightPos-leftPos>tailleMiniBloc)//on néglige les trop petits blocs.
                 {
-                currentBloc=new bloc(leftPos,rightPos);
-                theBlocs.push_back(currentBloc);
+                    currentBloc=new bloc(leftPos,rightPos, footerWidth, footerHeight);
+                    theBlocs.push_back(currentBloc);
                 }
 
             }
@@ -144,7 +160,7 @@ void Ligne::cleanTheBlocs()
 
     for(int i=0; i<theBlocs.size();i++)
     {
-        if (theBlocs[i]->checkDead()==true)
+        if (theBlocs[i]->checkDead())
         {
             theBlocs[i]->deadBloc();
             theBlocs.erase(theBlocs.begin()+i);
@@ -153,10 +169,10 @@ void Ligne::cleanTheBlocs()
         {
             for (int j=i+1; j<theBlocs.size();j++)
             {
-                if(theBlocs[i]->checkDuplicate  (theBlocs[j]));
+                if(theBlocs[i]->checkDuplicate(theBlocs[j]));
                 {
-                theBlocs[j]->deadBloc();
-                theBlocs.erase(theBlocs.begin()+j);
+                    theBlocs[j]->deadBloc();
+                    theBlocs.erase(theBlocs.begin()+j);
                 }
             }
         }

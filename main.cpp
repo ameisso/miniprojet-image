@@ -71,6 +71,10 @@ int main()
     Point P2(540,200);
 
     Ligne ligne1(P1, P2);
+    ligne1.setfooterWidth(28);
+    ligne1.setfooterHeight(20);
+
+
     //Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
     Mat montageImage(600, 600, CV_8UC3);
 
