@@ -2,14 +2,26 @@
 #include "opencv2/highgui/highgui.hpp"
 #include <cstdio>
 #include <iostream>
+#include <vector>
 #include "bloc.h"
+
 using namespace cv;
 using namespace std;
+/*
+typedef enum mouseState {
+    reset=0,
+    firstLeftButton=1,
+    secondLeftButton=2
+} mouseState;
+*/
+
 //*************************************************************************
 //Variables
 int imageIndex=0; //index de l'image que l'on est en train de traiter.
 int studiedLine=100;//numéro de la ligne de matrice que l'on étudie
 int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
+//mouseState inputState=reset; //var l'etat ou on est, on a choisit le premier point, le deuxieme, reset
+std::vector<Point> inputPoint;
 
 std::string path;//répertoire de travail
 Size extractedLineNoBackgroundSize;//taille de la matrice étudiée
@@ -152,9 +164,20 @@ void substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg)
 //Function qui detect le click du sourie et stoque les x et y
 void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
-     if  ( event == EVENT_LBUTTONDOWN )
+    if( event == EVENT_RBUTTONDOWN )
+    {
+       // inputState = reset;
+        inputPoint.clear();
+    }
+
+     if( event == EVENT_LBUTTONDOWN )
      {
-          cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
+         if( inputPoint.size() <= 1)
+         {
+             inputPoint.push_back(Point(x,y));
+         }
+        // cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
+
      }
 }
 
