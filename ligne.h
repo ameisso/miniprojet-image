@@ -4,13 +4,12 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "bloc.h"
+#include "backgroundsubtractoravg.h"
 
 using namespace cv;
 
 class Ligne
 {
-    Point P1, P2;
-    Mat Data,Bgr;
 public:
     Ligne();
     Ligne(Point P1, Point P2);
@@ -27,6 +26,10 @@ private :
     void detectionDesBlocs(Mat imageSansFond);
     string toString(int val);
     void cleanTheBlocs();
+
+    Point P1, P2;
+    Mat Data;
+    BackgroundSubtractorAvg bgSubtractor;
 };
 
 #endif // LIGNE_H
