@@ -1,4 +1,5 @@
 #include "bloc.h"
+#include "fonctions.h"
 
 
 bloc::bloc(int leftPos_, int rightPos_, int footerWidth_, int footerHeight_, Mat matriceFooters_, int matriceFootersLeftPos_,
@@ -53,8 +54,10 @@ void bloc::deadBloc()
 
         //Pour tester: Afficher et attendre
         imshow("XXX", matriceFooters);
-        waitKey(5000);
+        waitKey();
 
+        //Enregistrer
+        imwrite("bloc_" + intToString(lastLeftPos) + "_" + intToString(lastRightPos) + ".png", matriceFooters);
 
 
         toString();
