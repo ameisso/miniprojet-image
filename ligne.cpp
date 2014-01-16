@@ -42,17 +42,17 @@ void Ligne::setfooterHeight(int height)
 }
 
 // Extraire une ligne d'image d'origine et stocker dans Data
-void Ligne::extractFromImage(Mat image, Mat background)
+void Ligne::extractFromImage(Mat image)
 {
     LineIterator it(image, P1, P2, 4);
-    Data = Mat(1, it.count, CV_8UC3);
+    Mat newLine = Mat(1, it.count, CV_8UC3);
 
     for(int i = 0; i < it.count; i++, it++)
     {
-        Data.at<Vec3b>(0, i) = image.at<Vec3b>(it.pos());
+        newLine.at<Vec3b>(0, i) = image.at<Vec3b>(it.pos());
     }
     //Soustraction de fond
-    bgSubtractor(Data, Data, 0);
+    bgSubtractor(newLine, Data, 0.1);
     //Detection des blocs
     detectionDesBlocs(Data);
     //supression des blocs vides

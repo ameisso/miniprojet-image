@@ -2,6 +2,7 @@
 
 BackgroundSubtractorAvg::BackgroundSubtractorAvg()
 {
+    _initialized = false;
     _threshold = 10.0; //TODO adaptatif ou choisi par l'utilisateur
 }
 
@@ -9,20 +10,22 @@ BackgroundSubtractorAvg::BackgroundSubtractorAvg()
  *
  * @param image : the input frame from the video stream
  * @param fgmask : the computed image with background subtracted
+ *  /!\ image and fgmask must be 2 different buffers
  * @param learningRate : the value to use for exponential smoothing ;
  *      if learningRate = 0, the input image will have no effect on the background computation
  *      il learningRate = 1, the previous images will have no effect on the bg computation
  */
 void BackgroundSubtractorAvg::operator()(InputArray image, OutputArray fgmask, double learningRate)
 {
-    if(!_initialized)
-        initialize(image);
-
     //Check the parameters
     CV_Assert(learningRate >= 0.0 && learningRate <= 1.0);
     CV_Assert(image.type() == CV_8UC3);
 
     Mat currentFrame = image.getMat();
+
+    if(!_initialized)
+        initialize(currentFrame);
+
     //Gaussian blur on the current frame to limit spatial noise
     Mat blurredCurrent;
     GaussianBlur(currentFrame, blurredCurrent, Size(3,3), 0, 0);

@@ -31,9 +31,8 @@ public:
     void setfooterHeight(int height);
 
     const Mat& getData() const { return Data; }
-    void extractFromImage(Mat image, Mat background);
+    void extractFromImage(Mat image);
 private:
-    void substractBackground(Mat refImg, Mat CurrentImg, Mat &OutputImg);
     void detectionDesBlocs(Mat imageSansFond);
     void cleanTheBlocs();
 

@@ -100,18 +100,11 @@ int main()
             if(checkIfNewImage(imageIndex))
             {
                 currentImg = imread(path);
-                ligne1.extractFromImage(currentImg,refImg);
+                ligne1.extractFromImage(currentImg);
 
 
                 line(currentImg, ligne1.getP1(), ligne1.getP2(), Scalar(255, 0, 0));
                 imshow("Image avec ligne", currentImg);
-
-                //TEMP
-                Mat fgImage, bgImage;
-                bgsub(currentImg, fgImage, 0.1);
-                imshow("Foreground image", fgImage);
-                bgsub.getBackgroundImage(bgImage);
-                imshow("Background image", bgImage);
 
                 Mat data = ligne1.getData();
                 data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));

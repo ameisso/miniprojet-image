@@ -28,7 +28,7 @@ public:
 private:
     void initialize(InputArray firstImage);
     Mat _bgImage;
-    bool _initialized = false;
+    bool _initialized;
     double _threshold; //the threshold used for adaptive smoothing
 };
 
