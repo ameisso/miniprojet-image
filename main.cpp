@@ -102,9 +102,6 @@ int main()
     //Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
     Mat montageImage(600, 600, CV_8UC3);
 
-    //TEMP
-    BackgroundSubtractorAvg bgsub;
-
     while (1)
     {
         int c = waitKey(60);
@@ -125,12 +122,10 @@ int main()
 
                 for ( vector<Ligne>::iterator it=inputLigne.begin(); it !=inputLigne.end(); it++ )
                 {
-                    it->extractFromImage(currentImg,refImg);
-
+                    it->extractFromImage(currentImg);
 
                     line(currentImg, it->getP1(), it->getP2(), Scalar(255, 0, 0));
                     imshow("Image avec ligne", currentImg);
-
 
                     Mat data = it->getData();
                     data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
