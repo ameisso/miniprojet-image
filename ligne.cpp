@@ -137,9 +137,16 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
                     ajoutBloc=true;
                     //break;
 
-                    Mat mat = Mat(0, rightPos - leftPos, CV_8UC3);
-                    mat.push_back(Data.row(0).colRange(leftPos, rightPos));
-                    (*it)->pushBackToMatriceFooters(mat, leftPos, rightPos); //passer leftPos et comparer avec bloc::leftPos et corriger la position!!!
+                //    Mat mat = Mat(0, rightPos - leftPos, CV_8UC3);
+                    Mat mat = Mat::zeros(0, rightPos - leftPos - 2, CV_8UC3);
+
+                    mat.push_back(Data.row(0).colRange(leftPos + 1, rightPos - 1));
+
+                 /*   imshow("XXX", Data.row(0));
+                    waitKey();
+*/
+
+                    (*it)->pushBackToMatriceFooters(mat, leftPos + 1, rightPos - 1); //passer leftPos et comparer avec bloc::leftPos et corriger la position!!!
                 }
             }
             if(ajoutBloc==false)
@@ -148,10 +155,11 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
                 if(rightPos-leftPos>tailleMiniBloc)//on néglige les trop petits blocs.
                 {
                     //On ajoute au nouveau bloc aussi une matrice
-                    Mat mat = Mat(0, rightPos - leftPos, CV_8UC3);
-                    mat.push_back(Data.row(0).colRange(leftPos, rightPos));
+                //    Mat mat = Mat(0, rightPos - leftPos, CV_8UC3);
+                    Mat mat = Mat::zeros(0, rightPos - leftPos - 2, CV_8UC3);
+                    mat.push_back(Data.row(0).colRange(leftPos + 1, rightPos - 1));
 
-                    currentBloc = new bloc(leftPos,rightPos, footerWidth, footerHeight, mat, leftPos, rightPos);
+                    currentBloc = new bloc(leftPos,rightPos, footerWidth, footerHeight, mat, leftPos + 1, rightPos - 1);
                     theBlocs.push_back(currentBloc);
                 }
 

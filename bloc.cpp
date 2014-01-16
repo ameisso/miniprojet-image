@@ -185,7 +185,9 @@ void bloc::pushBackToMatriceFooters(Mat mat, int leftPos, int rightPos)
 */
 
         //Changer la taille de la matrice
+        int c = matriceFooters.cols;
         matriceFooters.create(matriceFooters.rows, nbCols, CV_8UC3);
+        matriceFooters.colRange(c, nbCols) = Scalar(0, 0, 0); //pour supprimer les pixels non-initialises
 
         //Enregistrer la nouvelle taille!
         matriceFootersRightPos = maxVal;
