@@ -24,6 +24,12 @@ public:
     ~BackgroundSubtractorAvg() {}
     void operator()(InputArray image, OutputArray fgmask, double learningRate=0);
     void getBackgroundImage(OutputArray bgImage) const;
+
+private:
+    void initialize(InputArray firstImage);
+    Mat _bgImage;
+    bool _initialized;
+    double _threshold; //the threshold used for adaptive smoothing
 };
 
 #endif // BACKGROUNDSUBTRACTORAVG_H

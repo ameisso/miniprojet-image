@@ -6,6 +6,7 @@
 #include <vector>
 #include "bloc.h"
 #include "ligne.h"
+#include "backgroundsubtractoravg.h"
 #include "fonctions.h"
 
 using namespace cv;
@@ -93,8 +94,16 @@ int main()
         }
     }
 
-    
+    /*Ligne ligne1(P1, P2);
+    ligne1.setfooterWidth(28);
+    ligne1.setfooterHeight(20);
+    A faire pour toutes les lignes ?*/
+
+    //Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
     Mat montageImage(600, 600, CV_8UC3);
+
+    //TEMP
+    BackgroundSubtractorAvg bgsub;
 
     while (1)
     {
@@ -125,15 +134,6 @@ int main()
 
                     Mat data = it->getData();
                     data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
-                }
-
-                // Afficher tous les x images -> c'est plus vite
-                if (imageIndex % 1 == 0)
-                {
-                    //imshow("data",data);
-                    //imshow("montageImage", montageImage);
-                    //cout << data.cols << endl;
-                    waitKey(1);
                 }
 
                 imageIndex++;

@@ -4,6 +4,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "bloc.h"
+#include "backgroundsubtractoravg.h"
 
 using namespace cv;
 
@@ -13,9 +14,6 @@ private:
     // Definir la taille d'un pieton. C'est la meme valeur pour tous le blocs sur une ligne
     int footerWidth;
     int footerHeight;
-
-    Point P1, P2;
-    Mat Data, Bgr;
 
     unsigned char seuil;//valeurs au dessus desquelles on détecte un bloc.
     int tailleMiniBloc;//taille en dessous de laquelle on analyse pas le bloc.
@@ -33,11 +31,15 @@ public:
     void setfooterHeight(int height);
 
     const Mat& getData() const { return Data; }
-    void extractFromImage(Mat image, Mat background);
+
+    void extractFromImage(Mat image);
 private:
-    void substractBackground(Mat refImg, Mat CurrentImg, Mat &OutputImg);
     void detectionDesBlocs(Mat imageSansFond);
     void cleanTheBlocs();
+
+    Point P1, P2;
+    Mat Data;
+    BackgroundSubtractorAvg bgSubtractor;
 };
 
 #endif // LIGNE_H

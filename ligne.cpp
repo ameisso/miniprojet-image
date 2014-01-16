@@ -1,4 +1,4 @@
-﻿Nb#include "ligne.h"
+﻿#include "ligne.h"
 #include "bloc.h"
 #include <iostream>
 #include <vector>
@@ -42,34 +42,24 @@ void Ligne::setfooterHeight(int height)
 }
 
 // Extraire une ligne d'image d'origine et stocker dans Data
-void Ligne::extractFromImage(Mat image, Mat background)
+void Ligne::extractFromImage(Mat image)
 {
-    Line Iterator it(image, P1, P2, 4);
-    Data = Mat(1, it.count, CV_8UC3);
-    Bgr= Mat(1, it.count, CV_8UC3);
+    LineIterator it(image, P1, P2, 4);
+    Mat newLine = Mat(1, it.count, CV_8UC3);
 
     for(int i = 0; i < it.count; i++, it++)
     {
-        Data.at<Vec3b>(0, i) = image.at<Vec3b>(it.pos());
-        Bgr.at<Vec3b>(0,i)=background.at<Vec3b>(it.pos());
+        newLine.at<Vec3b>(0, i) = image.at<Vec3b>(it.pos());
     }
     //Soustraction de fond
-    substractBackground(Bgr,Data,Data);//on soustrait le fond et on écrit dans data.
+    bgSubtractor(newLine, Data, 0.1);
     //Detection des blocs
     detectionDesBlocs(Data);
     //supression des blocs vides
     cleanTheBlocs();
     //Ici: Traitement de la ligne (Soustraction du fond. Blocs, etc)
 }
-/**************************************************
- * Fonction qui soustrait le fond à l'image.
- * Pour l'instant ca reste une fonction, dans le futur il faudra aussi modifier l'image de fond après la soustraction
- * C'est les histoires de moyenne glissante...
- * *************************************************/
-void Ligne::substractBackground(Mat refImg,Mat CurrentImg, Mat &OutputImg)
-{
-        absdiff(refImg,CurrentImg,OutputImg);
-}
+
 /**************************************************
  * Fonction qui prend une image auquel on a déja soustrait l'image de fond
  * et balaye tout les points de la matrice pour voir si leur intensité diffère de 0.
