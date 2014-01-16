@@ -6,6 +6,7 @@
 #include <vector>
 #include "bloc.h"
 #include "ligne.h"
+#include "fonctions.h"
 
 using namespace cv;
 using namespace std;
@@ -25,6 +26,8 @@ int studiedLine=100;//numéro de la ligne de matrice que l'on étudie
 int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
 //mouseState inputState=reset; //var l'etat ou on est, on a choisit le premier point, le deuxieme, reset
 std::vector<Point> inputPoint;
+std::vector<Ligne> inputLigne;
+Ligne ligneRef;
 
 std::string path;//répertoire de travail
 Size extractedLineNoBackgroundSize;//taille de la matrice étudiée
@@ -66,12 +69,31 @@ int main()
   //  Ligne ligne1(Point(30, 200), Point(600, 180));
   //  Ligne ligne1(Point(30, 200), Point(600, 200)); // droite y1=y2
 
-    //Ligne pour sur la rue
-    Point P1(180,300);
-    Point P2(540,200);
+    namedWindow("refImg",1);
+    imshow("refImg", refImg );
+    setMouseCallback("refImg", CallBackFunc, NULL);
 
-    Ligne ligne1(P1, P2);
-    //Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
+
+
+    //Ligne pour sur la rue
+    //Point P1(180,300);
+    //Point P2(540,200);
+
+    while( int w = waitKey(60) )
+    {
+        if( (char)w == 27 )//touche echap
+        {
+            break;
+        }
+        else if ( inputPoint.size() == 2 )
+        {
+            inputLigne.push_back(Ligne(inputPoint[0],inputPoint[1]));
+            cout<<"ligne ajoute"<<endl;
+            inputPoint.clear();
+        }
+    }
+
+    
     Mat montageImage(600, 600, CV_8UC3);
 
     while (1)
@@ -91,14 +113,19 @@ int main()
             if(checkIfNewImage(imageIndex))
             {
                 currentImg = imread(path);
-                ligne1.extractFromImage(currentImg,refImg);
+
+                for ( vector<Ligne>::iterator it=inputLigne.begin(); it !=inputLigne.end(); it++ )
+                {
+                    it->extractFromImage(currentImg,refImg);
 
 
-                line(currentImg, ligne1.getP1(), ligne1.getP2(), Scalar(255, 0, 0));
-                imshow("Image avec ligne", currentImg);
+                    line(currentImg, it->getP1(), it->getP2(), Scalar(255, 0, 0));
+                    imshow("Image avec ligne", currentImg);
 
-                Mat data = ligne1.getData();
-                data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
+
+                    Mat data = it->getData();
+                    data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
+                }
 
                 // Afficher tous les x images -> c'est plus vite
                 if (imageIndex % 1 == 0)
@@ -108,6 +135,7 @@ int main()
                     //cout << data.cols << endl;
                     waitKey(1);
                 }
+
                 imageIndex++;
             }
         }
@@ -120,15 +148,15 @@ bool checkIfNewImage(int lastImageIndex)
     //fonction qui va regarder dans le répertoire data si il y a une nouvelle image
     if (lastImageIndex<10)
     {
-        path="data/detection_000"+toString(lastImageIndex)+".jpeg";
+        path="data/detection_000"+intToString(lastImageIndex)+".jpeg";
     }
     else if (lastImageIndex<100)
     {
-        path="data/detection_00"+toString(lastImageIndex)+".jpeg";
+        path="data/detection_00"+intToString(lastImageIndex)+".jpeg";
     }
     else if (lastImageIndex<1000)
     {
-        path="data/detection_0"+toString(lastImageIndex)+".jpeg";
+        path="data/detection_0"+intToString(lastImageIndex)+".jpeg";
     }
     Mat img  = imread(path, 1);
     if(img.empty() )
@@ -144,14 +172,6 @@ bool checkIfNewImage(int lastImageIndex)
     }
 }
 
-//Fonction qui retourne la valeur d'un INT sous forme de chaine de charactère.
-string toString(int val)
-{
-    stringstream ss;
-    ss<<val;
-    string str=ss.str();
-    return str;
-}
 //Function qui detecte le click du sourie et stoque les x et y
 void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
@@ -167,7 +187,7 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
          {
              inputPoint.push_back(Point(x,y));
          }
-        // cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
+         cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
 
      }
 }
