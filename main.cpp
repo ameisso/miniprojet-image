@@ -128,15 +128,15 @@ bool checkIfNewImage(int lastImageIndex)
     //fonction qui va regarder dans le répertoire data si il y a une nouvelle image
     if (lastImageIndex<10)
     {
-        path="data/detection_000"+intToString(lastImageIndex)+".jpeg";
+        path="data/detection_000"+toString(lastImageIndex)+".jpeg";
     }
     else if (lastImageIndex<100)
     {
-        path="data/detection_00"+intToString(lastImageIndex)+".jpeg";
+        path="data/detection_00"+toString(lastImageIndex)+".jpeg";
     }
     else if (lastImageIndex<1000)
     {
-        path="data/detection_0"+intToString(lastImageIndex)+".jpeg";
+        path="data/detection_0"+toString(lastImageIndex)+".jpeg";
     }
     Mat img  = imread(path, 1);
     if(img.empty() )
@@ -150,6 +150,15 @@ bool checkIfNewImage(int lastImageIndex)
         //cout<<"image :"<<path<<" found"<<endl;
         return true;
     }
+}
+
+//Fonction qui retourne la valeur d'un INT sous forme de chaine de charactère.
+string toString(int val)
+{
+    stringstream ss;
+    ss<<val;
+    string str=ss.str();
+    return str;
 }
 
 //Function qui detecte le click du sourie et stoque les x et y
