@@ -15,9 +15,6 @@ private:
     int footerWidth;
     int footerHeight;
 
-    Point P1, P2;
-    Mat Data, Bgr;
-
     unsigned char seuil;//valeurs au dessus desquelles on détecte un bloc.
     int tailleMiniBloc;//taille en dessous de laquelle on analyse pas le bloc.
     vector<bloc*> theBlocs;//vecteur de pointeurs vers les blocs
