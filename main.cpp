@@ -11,88 +11,41 @@
 
 using namespace cv;
 using namespace std;
-/*
-typedef enum mouseState {
-    reset=0,
-    firstLeftButton=1,
-    secondLeftButton=2
-} mouseState;
-*/
 
-//*************************************************************************
-//Variables
-bool run=true;//si on appuie sur la touche r, on continue d'exectuter le programme, sinon, on l'arrete, ca permet de voir ce qui se passe dans les matrices.
-int imageIndex=0; //index de l'image que l'on est en train de traiter.
-int studiedLine=100;//numéro de la ligne de matrice que l'on étudie
-int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLine que l'on prend en compte.
-//mouseState inputState=reset; //var l'etat ou on est, on a choisit le premier point, le deuxieme, reset
-std::vector<Point> inputPoint;
-std::vector<Ligne> inputLigne;
-Ligne ligneRef;
-
-std::string path;//répertoire de travail
-Size extractedLineNoBackgroundSize;//taille de la matrice étudiée
-//image de référence qui sert à extraire le fond...
-//pour le moment c'est toujours la même, ensuite, on pourra toujours la modifier avec les autres images.
-Mat refImg=imread("data/detection_0000.jpeg");
-Mat currentImg;//image que l'on est en train d'analyser
-Mat extractedLine;//ligne extraite de l'image courante.
-Mat backgroundLine; //correspond aux lignes de l'image de fond que l'on étudie.
-Mat extractedLineNoBackground;//matrice de l'image sans fond.
 //*************************************************************************
 //Déclarations des fonctions
-bool checkIfNewImage(int lastImageIndex);
-string toString(int val);
-void extractLine(Mat img,Mat &extractedLine,int lineNumber, int lineWidth);
-void substractBackground(Mat refImg, Mat CurrentImg, Mat &OutputImg);
 void CallBackFunc(int event, int x, int y, int flags, void* userdata);
+void getLinesFromPrefsFile(string pathToFile, vector<Ligne> &lines);
+void storeLinesToPrefsFile(string pathToFile, vector<Ligne> &lines);
+void getLinesFromUser(InputArray refImg, string pathToFile, vector<Ligne> &lines);
 
 //*************************************************************************
 
 int main()
 {
+    //Variables
+    bool run=true;//si on appuie sur la touche r, on continue d'exectuter le programme, sinon, on l'arrete, ca permet de voir ce qui se passe dans les matrices.
+    std::vector<Ligne> inputLigne; //stockage des lignes de comptage
 
-    //on vérifie que l'image de fond existe (benêt, benêt, benêt!!!)
-    if(refImg.empty() )
+    string path = "data/detection_%04d.jpeg";//répertoire de travail ou index de la caméra
+    string prefsFilePath = "prefs.xml"; //fichier de stockage des paramètres (position des lignes et autres)
+    VideoCapture video(path);
+    int imageIndex = 0; //nb de frames analysées
+
+    Mat currentImg;//image que l'on est en train d'analyser
+    if(!video.read(currentImg))//récupération de la première image
     {
-        cout << "Couldn't open background image "<<endl;
-        return false;
+        cout << "Unable to open device or file " << path << endl;
+        return(1);
     }
-    //imshow("image de fond",refImg);
-    //cvWaitKey(1000);//on affiche l'image de fond 1s pour vérifier
 
-  /*
-   namedWindow("My Window", 1);  //Creer une fenetre
-   setMouseCallback("My Window", CallBackFunc, NULL); //settter la function de callback pour tout eveniment du sourie
-   imshow("My Window", refIMG);//montre l'image
-   waitKey(0);//attends jusqu'a le user appuye
-   */
-  //  Ligne ligne1(Point(30, 200), Point(600, 180));
-  //  Ligne ligne1(Point(30, 200), Point(600, 200)); // droite y1=y2
+    //Récupération des paramètres précédents
+    getLinesFromPrefsFile(prefsFilePath, inputLigne);
 
-    namedWindow("refImg",1);
-    imshow("refImg", refImg );
-    setMouseCallback("refImg", CallBackFunc, NULL);
+    if(inputLigne.size() == 0) //si aucune ligne définie
+        getLinesFromUser(currentImg, prefsFilePath, inputLigne);
 
-
-
-    //Ligne pour sur la rue
-    //Point P1(180,300);
-    //Point P2(540,200);
-
-    while( int w = waitKey(60) )
-    {
-        if( (char)w == 27 )//touche echap
-        {
-            break;
-        }
-        else if ( inputPoint.size() == 2 )
-        {
-            inputLigne.push_back(Ligne(inputPoint[0],inputPoint[1]));
-            cout<<"ligne ajoute"<<endl;
-            inputPoint.clear();
-        }
-    }
+    //TODO ajouter bouton pour entrée des lignes par l'utilisateur
 
     /*Ligne ligne1(P1, P2);
     ligne1.setfooterWidth(28);
@@ -104,7 +57,7 @@ int main()
 
     while (1)
     {
-        int c = waitKey(60);
+        int c = waitKey(20);
         if( (char)c == 27 )//touche echap
         {
             break;
@@ -116,10 +69,8 @@ int main()
         }
         if (run)
         {
-            if(checkIfNewImage(imageIndex))
+            if(video.read(currentImg))
             {
-                currentImg = imread(path);
-
                 for ( vector<Ligne>::iterator it=inputLigne.begin(); it !=inputLigne.end(); it++ )
                 {
                     it->extractFromImage(currentImg);
@@ -137,53 +88,93 @@ int main()
     }
 }
 
-
-bool checkIfNewImage(int lastImageIndex)
-{
-    //fonction qui va regarder dans le répertoire data si il y a une nouvelle image
-    if (lastImageIndex<10)
-    {
-        path="data/detection_000"+intToString(lastImageIndex)+".jpeg";
-    }
-    else if (lastImageIndex<100)
-    {
-        path="data/detection_00"+intToString(lastImageIndex)+".jpeg";
-    }
-    else if (lastImageIndex<1000)
-    {
-        path="data/detection_0"+intToString(lastImageIndex)+".jpeg";
-    }
-    Mat img  = imread(path, 1);
-    if(img.empty() )
-    {
-        cout << "Couldn't open image "<<lastImageIndex<<endl;
-        cvWaitKey();
-        return false;
-    }
-    else
-    {
-        //cout<<"image :"<<path<<" found"<<endl;
-        return true;
-    }
-}
-
 //Function qui detecte le click du sourie et stoque les x et y
+//on envoie dans userdata un pointeur vers inputPoint qui est un vector de Point
 void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
+    vector<Point> *inputPoints = (vector<Point>*)userdata;
     if( event == EVENT_RBUTTONDOWN )
     {
        // inputState = reset;
-        inputPoint.clear();
+        inputPoints->clear();
     }
 
      if( event == EVENT_LBUTTONDOWN )
      {
-         if( inputPoint.size() <= 1)
+         if( inputPoints->size() <= 1)
          {
-             inputPoint.push_back(Point(x,y));
+             inputPoints->push_back(Point(x,y));
          }
          cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
 
      }
 }
 
+/* Récupération des lignes de comptage depuis un fichier de préférénces XML */
+void getLinesFromPrefsFile(string pathToFile, vector<Ligne> &lines)
+{
+    FileStorage prefs(pathToFile, FileStorage::READ);
+
+    FileNode lignes = prefs["lignes"];
+    FileNodeIterator it = lignes.begin(), it_end = lignes.end();
+
+    Point P1,P2;
+
+    for( ; it != it_end ; ++it)
+    {
+        (*it)["P1"] >> P1;
+        (*it)["P2"] >> P2;
+
+        lines.push_back(Ligne(P1,P2));
+    }
+
+    prefs.release();
+}
+
+/* Stockage des lignes de comptage dans un fichier de préférences XML */
+void storeLinesToPrefsFile(string pathToFile, vector<Ligne> &lines)
+{
+    FileStorage prefs(pathToFile, FileStorage::WRITE);
+
+    prefs << "lignes" << "[";
+    for(vector<Ligne>::iterator it = lines.begin(); it != lines.end(); ++it)
+    {
+        prefs << "{" << "P1" << (*it).getP1() << "P2" << (*it).getP2() << "}";
+    }
+    prefs << "]";
+
+    prefs.release();
+}
+
+/* Entrée des lignes de comptage par l'utilisateur puis stockage dans le fichier de préférences XML */
+void getLinesFromUser(InputArray refImg, string pathToFile, vector<Ligne> &lines)
+{
+    std::vector<Point> inputPoint;
+    Mat img = refImg.getMat();
+
+    namedWindow("refImg",1);
+    imshow("refImg", img );
+    setMouseCallback("refImg", CallBackFunc, &inputPoint);
+
+    //TODO affichage instructions
+
+    while( int w = waitKey(60) )
+    {
+        if( (char)w == 27 )//touche echap
+        {
+            break;
+        }
+        else if ( inputPoint.size() == 2 )
+        {
+            lines.push_back(Ligne(inputPoint[0],inputPoint[1]));
+            cout<<"ligne ajoute"<<endl;
+            inputPoint.clear();
+
+            line(img, inputPoint[0], inputPoint[1], Scalar(255, 0, 0));
+            imshow("refImg", img);
+        }
+    }
+
+    storeLinesToPrefsFile(pathToFile, lines);
+
+}
