@@ -24,6 +24,8 @@ public:
     ~BackgroundSubtractorAvg() {}
     void operator()(InputArray image, OutputArray fgmask, double learningRate=0);
     void getBackgroundImage(OutputArray bgImage) const;
+    float getThreshold();
+    void setThreshold(float thresh=10.0);
 
 private:
     void initialize(InputArray firstImage);

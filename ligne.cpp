@@ -27,6 +27,8 @@ Ligne::Ligne(int nrLigne , Point P1, Point P2) : P1(P1), P2(P2)
 
     nbFooters=0;
 
+    bgSubtractor.setThreshold(10.0); //TODO qu'est ce qu'on fait de ce paramètre ?
+
 /*  ---> On a plus besoin de ca?
     //on ajoute un bloc par défaut, sinon l'itérateur ne tourne pas, il y a surement une meilleure facon de faire..mais pour essayer ca ira.
     bloc *defautBloc = new bloc(0,0, footerWidth, footerHeight);
@@ -58,7 +60,7 @@ void Ligne::extractFromImage(Mat image)
         newLine.at<Vec3b>(0, i) = image.at<Vec3b>(it.pos());
     }
     //Soustraction de fond
-    bgSubtractor(newLine, Data, 0.1);
+    bgSubtractor(newLine, Data, 0.1); //TODO le learning rate ? adaptatif ? constant ? choisi par l'utilisateur ?
     //Detection des blocs
     detectionDesBlocs(Data);
     //supression des blocs vides
@@ -178,7 +180,7 @@ int Ligne::cleanTheBlocs()
         {
             for (int j=i+1; j<theBlocs.size();j++)
             {
-                if(theBlocs[i]->checkDuplicate(theBlocs[j]));
+                if(theBlocs[i]->checkDuplicate(theBlocs[j]))
                 {
                     theBlocs[j]->deadBloc();
                     theBlocs.erase(theBlocs.begin()+j);

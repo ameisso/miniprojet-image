@@ -18,8 +18,12 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 void getLinesFromPrefsFile(string pathToFile, vector<Ligne> &lines);
 void storeLinesToPrefsFile(string pathToFile, vector<Ligne> &lines);
 void getLinesFromUser(InputArray refImg, string pathToFile, vector<Ligne> &lines);
+void modifierLignesCallBack(int state, void* userdata);
 
 //*************************************************************************
+
+const string path = "data/detection_%04d.jpeg";//répertoire de travail ou index de la caméra
+const string prefsFilePath = "prefs.xml"; //fichier de stockage des paramètres (position des lignes et autres)
 
 int main()
 {
@@ -27,8 +31,6 @@ int main()
     bool run=true;//si on appuie sur la touche r, on continue d'exectuter le programme, sinon, on l'arrete, ca permet de voir ce qui se passe dans les matrices.
     std::vector<Ligne> inputLigne; //stockage des lignes de comptage
 
-    string path = "data/detection_%04d.jpeg";//répertoire de travail ou index de la caméra
-    string prefsFilePath = "prefs.xml"; //fichier de stockage des paramètres (position des lignes et autres)
     VideoCapture video(path);
     int imageIndex = 0; //nb de frames analysées
 
@@ -45,7 +47,9 @@ int main()
     if(inputLigne.size() == 0) //si aucune ligne définie
         getLinesFromUser(currentImg, prefsFilePath, inputLigne);
 
-    //TODO ajouter bouton pour entrée des lignes par l'utilisateur
+    //Bouton pour proposer à l'utilisateur de modifier les lignes
+    bool updateLines = false;
+    //createButton("Modifier lignes", modifierLignesCallBack, &updateLines); //openCV doit être compilé avec le "Qt support" pour que ça fonctionne
 
     /*Ligne ligne1(P1, P2);
     ligne1.setfooterWidth(28);
@@ -54,6 +58,8 @@ int main()
 
     //Mat montageImage(600, abs(ligne1.getP1().x - ligne1.getP2().x), CV_8UC3);
     Mat montageImage(600, 600, CV_8UC3);
+
+    cout << "Comptage de pietons ; appuyer sur 'r' pour pause/redémarrage" << endl << "appuyer sur 'c' pour changer les lignes de comptage" << endl;
 
     while (1)
     {
@@ -67,6 +73,10 @@ int main()
             cout<<"run"<<endl;
             run=!run;
         }
+        else if((char)c=='c')
+        {
+            getLinesFromUser(currentImg, prefsFilePath, inputLigne);
+        }
         if (run)
         {
             if(video.read(currentImg))
@@ -76,7 +86,7 @@ int main()
                     it->extractFromImage(currentImg);
 
                     line(currentImg, it->getP1(), it->getP2(), Scalar(255, 0, 0));
-                    imshow("Image avec ligne", currentImg);
+                    imshow("Comptage de piétons", currentImg);
 
                     Mat data = it->getData();
                     data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
@@ -105,7 +115,7 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
          {
              inputPoints->push_back(Point(x,y));
          }
-         cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
+         //cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
 
      }
 }
@@ -153,11 +163,13 @@ void getLinesFromUser(InputArray refImg, string pathToFile, vector<Ligne> &lines
     std::vector<Point> inputPoint;
     Mat img = refImg.getMat();
 
-    namedWindow("refImg",1);
-    imshow("refImg", img );
-    setMouseCallback("refImg", CallBackFunc, &inputPoint);
+    namedWindow("Modification lignes",1);
+    imshow("Modification lignes", img );
+    setMouseCallback("Modification lignes", CallBackFunc, &inputPoint);
 
-    //TODO affichage instructions
+    lines.clear();
+
+    cout << "Cliquer pour définir les extrémités de la nouvelle ligne puis Echap quand termine" << endl;
 
     while( int w = waitKey(60) )
     {
@@ -168,14 +180,25 @@ void getLinesFromUser(InputArray refImg, string pathToFile, vector<Ligne> &lines
         else if ( inputPoint.size() == 2 )
         {
             lines.push_back(Ligne(lines.size(),inputPoint[0],inputPoint[1]));
-            cout<<"ligne ajoute"<<endl;
+            cout<<"ligne ajoutee"<<endl;
             inputPoint.clear();
 
-            line(img, inputPoint[0], inputPoint[1], Scalar(255, 0, 0));
-            imshow("refImg", img);
+            line(img, inputPoint[0], inputPoint[1], Scalar(255, 255, 255));
+            imshow("Modification lignes", img);
         }
     }
 
+    destroyWindow("Modification lignes");
+
     storeLinesToPrefsFile(pathToFile, lines);
 
+}
+
+/* Fonction de callback pour le bouton "Modifier lignes" */
+void modifierLignesCallBack(int state, void* userdata)
+{
+    bool *update = (bool*)userdata;
+
+    if(state)
+        *update = true;
 }

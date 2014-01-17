@@ -3,7 +3,7 @@
 BackgroundSubtractorAvg::BackgroundSubtractorAvg()
 {
     _initialized = false;
-    _threshold = 10.0; //TODO adaptatif ou choisi par l'utilisateur
+    _threshold = 10.0; //default value
 }
 
 /* Compute the background subtraction on the current frame
@@ -65,4 +65,19 @@ void BackgroundSubtractorAvg::initialize(InputArray firstImage)
     _bgImage = firstImage.getMat();
 
     _initialized = true;
+}
+
+float BackgroundSubtractorAvg::getThreshold()
+{
+    return _threshold;
+}
+
+/* Set the threshold
+ * @param thresh : the value of the threshold used for adaptive smoothing
+ *  if the pixel in the new image is too different (difference of intensity > threshold)
+ *  then it isn't taken into account in the smoothing
+ */
+void BackgroundSubtractorAvg::setThreshold(float thresh)
+{
+    _threshold = thresh;
 }
