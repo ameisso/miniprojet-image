@@ -78,8 +78,12 @@ void Ligne::extractFromImage(Mat image)
  * *************************************************/
 void Ligne::detectionDesBlocs(Mat imageSansFond)
 {
-    //cvtColor(imageSansFond,imageSansFond,CV_BGR2GRAY);
-    //adaptiveThreshold(imageSansFond,imageSansFond,1, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV,3, 230);
+    // on erode le bloc pour virer le bruit.
+    Mat lignePreTraitement=imageSansFond;
+    Mat element = getStructuringElement(1,Size(tailleMiniBloc-1, tailleMiniBloc-1));
+    erode(lignePreTraitement,imageSansFond,element);
+
+
     Mat grandeImageSansFond=imageSansFond;//aucun traitement sur cette matrice, ne sert qu'à l'affichage.
     int leftPos=0, rightPos=0; //Position extrème des pixels du bloc.
     bloc*currentBloc;
@@ -127,7 +131,7 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
             intensity.val[1]=255;
             rightPos=i-1;
             ajoutBloc=false;
-            //cout<<i<<" ["<<leftPos<<","<<rightPos<<"] "<<(rightPos-leftPos)<<endl;
+            //cout<<i<<" ["<<leftPos<<","<<rightPos<<"] "<<(rightPos-leftPos)<<endl;                      
             //on vérifie dans le vecteur des blocs si on peut ajouter ce bloc.
             for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
             {

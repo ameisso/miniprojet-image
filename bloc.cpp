@@ -23,7 +23,7 @@ bool bloc::checkNewLine(int leftPos, int rightPos)
     {
         //cout<<leftPos<<","<<rightPos<<" owned by ["<<lastLeftPos<<","<<lastRightPos<<"] widht :"<<maxBlocWidth<<endl;
         blocHeight++;// on augmente le nombre de frames pour mesurer la longeur du bloc.(+1);
-        if (rightPos-leftPos>maxBlocWidth)
+        if (rightPos-leftPos>maxBlocWidth)//mise à jour de la largeur maximale du bloc.
         {
             maxBlocWidth=rightPos-leftPos;
             //cout<<"MaxBlocWidth updated"<<endl;
