@@ -163,6 +163,11 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
     for(int i=0; i<30;i++) grandeImageSansFond.push_back(imageSansFond);
     imshow("grandeImageSansFond",grandeImageSansFond);
 }
+
+int Ligne::getNbFooters()
+{
+    return nbFooters;
+}
 //on fait le ménage dans les blocs (on supprime les blocs morts)
 int Ligne::cleanTheBlocs()
 {
