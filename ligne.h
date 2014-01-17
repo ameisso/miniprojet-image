@@ -24,6 +24,7 @@ public:
 
     Point getP1() const { return P1; }
     Point getP2() const { return P2; }
+    int   getNbFooters();
 
     int getfooterWidth() const { return footerWidth; }
     int getfooterHeight() const { return footerHeight; }

@@ -30,7 +30,7 @@ int main()
     string path = "data/detection_%04d.jpeg";//répertoire de travail ou index de la caméra
     string prefsFilePath = "prefs.xml"; //fichier de stockage des paramètres (position des lignes et autres)
     VideoCapture video(path);
-    int imageIndex = 0; //nb de frames analysées
+    int nbFootersMoyenne = 0 ;//nb footers moyenne
 
     Mat currentImg;//image que l'on est en train d'analyser
     if(!video.read(currentImg))//récupération de la première image
@@ -78,11 +78,17 @@ int main()
                     line(currentImg, it->getP1(), it->getP2(), Scalar(255, 0, 0));
                     imshow("Image avec ligne", currentImg);
 
-                    Mat data = it->getData();
-                    data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));
-                }
+                   /* Mat data = it->getData();
+                    data.copyTo(montageImage(Rect(0, imageIndex, data.cols, data.rows)));*/
 
-                imageIndex++;
+                    int nbFootersnew= it->getNbFooters();
+                    nbFootersMoyenne += nbFootersnew;
+
+                }
+                nbFootersMoyenne = nbFootersMoyenne/inputLigne.size();
+                cout<<"nombre des pietons en moyenne"<<nbFootersMoyenne<<endl;
+                nbFootersMoyenne = 0;
+                //imageIndex++;
             }
         }
     }
