@@ -9,17 +9,23 @@
 using namespace std;
 using namespace cv;
 
+/*
 Ligne::Ligne() : Ligne(Point(0,0), Point(0,0))
 {
 }
+*/
 
-Ligne::Ligne(Point P1, Point P2) : P1(P1), P2(P2)
+Ligne::Ligne(int nrLigne , Point P1, Point P2) : P1(P1), P2(P2)
 {
+    this->nrLigne = nrLigne;
+
     footerWidth = 28;
     footerHeight = 20;
 
     seuil=10;
     tailleMiniBloc=5;
+
+    nbFooters=0;
 
 /*  ---> On a plus besoin de ca?
     //on ajoute un bloc par défaut, sinon l'itérateur ne tourne pas, il y a surement une meilleure facon de faire..mais pour essayer ca ira.
@@ -56,7 +62,11 @@ void Ligne::extractFromImage(Mat image)
     //Detection des blocs
     detectionDesBlocs(Data);
     //supression des blocs vides
-    cleanTheBlocs();
+    int footers = cleanTheBlocs();
+    nbFooters += footers;
+    if(footers != 0 )
+        cout<<"nombre ligne"<<nrLigne<<"pietons avoir passe la ligne "<<nbFooters<<endl;
+
     //Ici: Traitement de la ligne (Soustraction du fond. Blocs, etc)
 }
 
@@ -148,14 +158,16 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
     imshow("grandeImageSansFond",grandeImageSansFond);
 }
 //on fait le ménage dans les blocs (on supprime les blocs morts)
-void Ligne::cleanTheBlocs()
+int Ligne::cleanTheBlocs()
 {
-
+    int newfooters=0;
     for(int i=0; i<theBlocs.size();i++)
     {
         if (theBlocs[i]->checkDead())
         {
             theBlocs[i]->deadBloc();
+            newfooters += theBlocs[i]->getNbFooters();
+
             theBlocs.erase(theBlocs.begin()+i);
         }
         else//si le bloc est pas mort, on vérifie qu'il n'existe pas un autre bloc avec les même paramètre
@@ -170,5 +182,6 @@ void Ligne::cleanTheBlocs()
             }
         }
     }
+    return newfooters;
 }
 

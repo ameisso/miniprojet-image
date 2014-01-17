@@ -28,7 +28,7 @@ int studiedLineWidth=100;//nombre de lignes vers le bas par rapport à studiedLi
 //mouseState inputState=reset; //var l'etat ou on est, on a choisit le premier point, le deuxieme, reset
 std::vector<Point> inputPoint;
 std::vector<Ligne> inputLigne;
-Ligne ligneRef;
+//Ligne ligneRef;
 
 std::string path;//répertoire de travail
 Size extractedLineNoBackgroundSize;//taille de la matrice étudiée
@@ -46,6 +46,8 @@ string toString(int val);
 void extractLine(Mat img,Mat &extractedLine,int lineNumber, int lineWidth);
 void substractBackground(Mat refImg, Mat CurrentImg, Mat &OutputImg);
 void CallBackFunc(int event, int x, int y, int flags, void* userdata);
+
+int nrLigne = 0;
 
 //*************************************************************************
 
@@ -88,7 +90,7 @@ int main()
         }
         else if ( inputPoint.size() == 2 )
         {
-            inputLigne.push_back(Ligne(inputPoint[0],inputPoint[1]));
+            inputLigne.push_back( Ligne(nrLigne++, inputPoint[0],inputPoint[1]));
             cout<<"ligne ajoute"<<endl;
             inputPoint.clear();
         }
@@ -104,7 +106,7 @@ int main()
 
     while (1)
     {
-        int c = waitKey(60);
+        int c = waitKey(20);
         if( (char)c == 27 )//touche echap
         {
             break;

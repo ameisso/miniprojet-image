@@ -19,14 +19,15 @@ private:
     int tailleMiniBloc;//taille en dessous de laquelle on analyse pas le bloc.
     vector<bloc*> theBlocs;//vecteur de pointeurs vers les blocs
 public:
-    Ligne();
-    Ligne(Point P1, Point P2);
+    //Ligne();
+    Ligne(int nrLigne, Point P1, Point P2);
 
     Point getP1() const { return P1; }
     Point getP2() const { return P2; }
 
     int getfooterWidth() const { return footerWidth; }
     int getfooterHeight() const { return footerHeight; }
+    //   int nbFooters() const {return nbFooter;}
     void setfooterWidth(int width);
     void setfooterHeight(int height);
 
@@ -35,11 +36,16 @@ public:
     void extractFromImage(Mat image);
 private:
     void detectionDesBlocs(Mat imageSansFond);
-    void cleanTheBlocs();
+    int cleanTheBlocs();
+
 
     Point P1, P2;
     Mat Data;
     BackgroundSubtractorAvg bgSubtractor;
+    int nbFooters;
+
+    int nrLigne;
+
 };
 
 #endif // LIGNE_H

@@ -12,6 +12,7 @@ bloc::bloc(int leftPos_, int rightPos_, int footerWidth_, int footerHeight_)
    // cout<<"new bloc ["<<lastLeftPos<<","<<lastRightPos<<"] widht :"<<maxBlocWidth<<endl;
     blocHeight=1;
     dead=false;
+    nbFooters=0;
 }
 
 //Fonction qui prend en paramètre les position des valeurs non noires de la matrice "extractedLineNoBackground" et qui vérifie si elle appartient a ce bloc.
@@ -48,11 +49,6 @@ void bloc::deadBloc()
     nbFooters=nbFooterInWidth+nbFooterInHeight;
     cout<<nbFooterInWidth<<"+"<<nbFooterInHeight<<"piétons comptés dans le bloc";
     toString();
-    }
-    else
-    {
-        nbFooters=0;
-        //cout<<"pas de nouveaux piétons"<<endl;
     }
 }
 int bloc::getNbFooters()
