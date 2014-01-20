@@ -19,32 +19,31 @@ Ligne::Ligne(int nrLigne , Point P1, Point P2) : P1(P1), P2(P2)
 {
     this->nrLigne = nrLigne;
 
+    //Valeurs par défaut
     footerWidth = 28;
     footerHeight = 20;
-
+    bgSubtractor.setThreshold(10.0);
     seuil=10;
-    tailleMiniBloc=5;
 
+    tailleMiniBloc=footerWidth/2;
     nbFooters=0;
 
-    bgSubtractor.setThreshold(10.0); //TODO qu'est ce qu'on fait de ce paramètre ?
-
-/*  ---> On a plus besoin de ca?
-    //on ajoute un bloc par défaut, sinon l'itérateur ne tourne pas, il y a surement une meilleure facon de faire..mais pour essayer ca ira.
-    bloc *defautBloc = new bloc(0,0, footerWidth, footerHeight);
-    theBlocs.push_back(defautBloc);
-*/
 }
 
 // Pour changer la taille d'un pieton, il faut iterer dans tous les blocs
 void Ligne::setfooterWidth(int width)
 {
+    footerWidth = width;
+    tailleMiniBloc=width/2;
+
     for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
         (*it)->setfooterWidth(width);
 }
 
 void Ligne::setfooterHeight(int height)
 {
+    footerHeight = height;
+
     for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
         (*it)->setfooterHeight(height);
 }
@@ -60,16 +59,15 @@ void Ligne::extractFromImage(Mat image)
         newLine.at<Vec3b>(0, i) = image.at<Vec3b>(it.pos());
     }
     //Soustraction de fond
-    bgSubtractor(newLine, Data, 0.1); //TODO le learning rate ? adaptatif ? constant ? choisi par l'utilisateur ?
+    bgSubtractor(newLine, Data, bgLearningRate);
     //Detection des blocs
     detectionDesBlocs(Data);
     //supression des blocs vides
     int footers = cleanTheBlocs();
     nbFooters += footers;
-    if(footers != 0 )
-        cout<<"nombre ligne"<<nrLigne<<"pietons avoir passe la ligne "<<nbFooters<<endl;
 
-    //Ici: Traitement de la ligne (Soustraction du fond. Blocs, etc)
+    //if(footers != 0 )
+        //cout<<"nombre ligne"<<nrLigne<<"pietons avoir passe la ligne "<<nbFooters<<endl;
 }
 
 /**************************************************
@@ -81,9 +79,9 @@ void Ligne::extractFromImage(Mat image)
 void Ligne::detectionDesBlocs(Mat imageSansFond)
 {
     // on erode le bloc pour virer le bruit.
-    Mat lignePreTraitement=imageSansFond;
+/*    Mat lignePreTraitement=imageSansFond;
     Mat element = getStructuringElement(1,Size(tailleMiniBloc-1, tailleMiniBloc-1));
-    erode(lignePreTraitement,imageSansFond,element);
+    erode(lignePreTraitement,imageSansFond,element);*/
 
 
     Mat grandeImageSansFond=imageSansFond;//aucun traitement sur cette matrice, ne sert qu'à l'affichage.
@@ -160,7 +158,9 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
     }
 
     //on multiplie la matrice pour voir x* la même ligne pour y voir plus clair
-    for(int i=0; i<30;i++) grandeImageSansFond.push_back(imageSansFond);
+    for(int i=0; i<30;i++)
+        grandeImageSansFond.push_back(imageSansFond);
+
     imshow("grandeImageSansFond",grandeImageSansFond);
 }
 
@@ -187,7 +187,7 @@ int Ligne::cleanTheBlocs()
             {
                 if(theBlocs[i]->checkDuplicate(theBlocs[j]))
                 {
-                    theBlocs[j]->deadBloc();
+                    //theBlocs[j]->deadBloc();
                     theBlocs.erase(theBlocs.begin()+j);
                 }
             }
@@ -196,3 +196,17 @@ int Ligne::cleanTheBlocs()
     return newfooters;
 }
 
+void Ligne::setBgLearningRate(double bgLR)
+{
+    bgLearningRate = bgLR;
+}
+
+void Ligne::setBgThreshold(int bgThresh)
+{
+    bgSubtractor.setThreshold(bgThresh);
+}
+
+void Ligne::setDetectionThreshold(int detThresh)
+{
+    seuil = detThresh;
+}
