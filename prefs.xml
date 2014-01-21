@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<lignes>
+  <_>
+    <P1>
+      185 327</P1>
+    <P2>
+      536 208</P2></_>
+  <_>
+    <P1>
+      204 382</P1>
+    <P2>
+      582 245</P2></_>
+  <_>
+    <P1>
+      154 201</P1>
+    <P2>
+      451 112</P2></_>
+  <_>
+    <P1>
+      144 144</P1>
+    <P2>
+      393 76</P2></_>
+  <_>
+    <P1>
+      130 88</P1>
+    <P2>
+      310 46</P2></_>
+  <_>
+    <P1>
+      150 175</P1>
+    <P2>
+      428 97</P2></_></lignes>
+<footerWidth>22</footerWidth>
+<footerHeight>13</footerHeight>
+<bgLearningRate>1.0000000000000001e-01</bgLearningRate>
+<bgThreshold>10</bgThreshold>
+<detThreshold>10</detThreshold>
+</opencv_storage>
