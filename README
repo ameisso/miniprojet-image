@@ -1,0 +1,84 @@
+/***********************************************************************
+Projet de détection de piétons dans une séquence vidéo
+
+Alina Caramizaru, Martin Altenburg, Tom Magnier, Antoine Meissonnier
+INSA Lyon - 5GE TdSI  --  janvier 2014
+/***********************************************************************
+
+I/ Compilation et fichiers nécessaires
+
+Un exemple de  fichier Makefile est fourni pour la compilation sous 
+Linux ; le programme a été écrit en utilisant Qt Creator donc le 
+Makefile contient des références aux librairies Qt, toutefois elles ne 
+devraient pas être nécessaires pour l'exécution. 
+
+Les librairies devant être incluses sont les suivantes : 
+	*libopencv_core
+	*libopencv_imgproc
+	*libopencv_highgui
+	*libopencv_video
+	
+Pour la bonne exécution du programme il faut que soient localisés le 
+fichier de préférences (par défaut prefs.xml dans le dossier 
+contenant l'exécutable) et le dossier contenant la suite d'images 
+formant la séquence vidéo. Par défaut le programme cherche ces 
+images dans le dossier ./data/detection_xxxx.jpeg.
+
+Ces deux chemins sont définis en dur dans le programme (premières 
+lignes de main.cpp).
+
+
+II/ Réglages des divers paramètres
+
+Dans le fichier de préférences, plusieurs paramètres de réglage 
+pour l'exécution du programme sont définis :
+
+	1) Lignes de comptage
+Ces lignes peuvent être tracées directement dans la fenêtre du 
+programme en appuyant sur 'c' pendant l'exécution. La touche Echap 
+permet d'enregistrer les modifications à la fin du tracé.
+
+	2) "Largeur" d'un piéton (footerWidth)
+Ce paramètre définit le nombre de pixels qu'occupe un piéton à son 
+passage sur les lignes de comptage.
+Si trop de piétons sont détectés d'un coup au passage d'un groupe il 
+faut donc l'augmenter.
+
+	3) "Hauteur" d'un piéton (footerHeight)
+Ce paramètre définit en fait le nombre de lignes minimum pour qu'un 
+bloc puisse être considéré comme un piéton et non comme du bruit.
+En cas de fausses détections il convient de l'augmenter.
+
+	4) Taux d'apprentissage pour la soustraction du fond 
+	(bgLearningRate)
+Ce paramètre définit l'importance de chaque nouvelle image dans la 
+constitution de l'image de fond et doit être compris entre 0 et 1. 
+Si le taux vaut 0, la nouvelle image n'a aucune incidence sur le fond 
+et c'est la première image de la séquence qui sera utilisée comme 
+image de fond.
+Si le taux vaut 1, l'image de fond est toujours égale à l'image 
+courante et on n'obtiendra que des pixels noirs après soustraction.
+
+	5) Seuil pour la soustraction de fond (bgThreshold)
+Lors de la soustraction de fond, les pixels trop différents d'une 
+image à l'autre (lors du passage d'un piéton dans notre cas) ne sont 
+pas pris en compte dans l'image de fond. Ce paramètre définit la 
+différence d'intensité qu'il doit y avoir entre les pixels de l'image 
+de fond et de l'image courante pour qu'il n'y ait pas d'évolution de 
+l'image de fond.
+
+	6) Seuil pour la détection de piétons (detThreshold)
+Ce paramètre définit l'intensité nécessaire pour qu'un pixel, 
+après soustraction de l'image de fond, ne soit pas considéré comme 
+du bruit mais comme faisant partie d'un bloc représentant un ou 
+plusieurs piétons.
+
+
+
+
+
+
+
+
+
+

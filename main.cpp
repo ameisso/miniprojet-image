@@ -80,7 +80,7 @@ int main()
 
     while (1)
     {
-        int c = waitKey(1);
+        int c = waitKey(20);
         if( (char)c == 27 )//touche echap
         {
             break;
