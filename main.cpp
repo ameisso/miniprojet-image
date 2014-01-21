@@ -21,7 +21,7 @@ void getLinesFromUser(InputArray refImg, vector<Ligne> &lines);
 void modifierLignesCallBack(int state, void* userdata);
 
 //*************************************************************************
-
+//const string path = "data/tracking/tracking_%04d.jpeg";//répertoire de travail ou index de la caméra
 const string path = "data/detection_%04d.jpeg";//répertoire de travail ou index de la caméra
 const string prefsFilePath = "prefs.xml"; //fichier de stockage des paramètres (position des lignes et autres)
 const string windowName = "Comptage de pietons"; //Nom de la fenêtre
