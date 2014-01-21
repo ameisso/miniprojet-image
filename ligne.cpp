@@ -20,10 +20,10 @@ Ligne::Ligne(int nrLigne , Point P1, Point P2) : P1(P1), P2(P2)
     this->nrLigne = nrLigne;
 
     //Valeurs par défaut
-    footerWidth = 28;
-    footerHeight = 20;
+    footerWidth = 1;
+    footerHeight = 1;
     bgSubtractor.setThreshold(10.0);
-    seuil=10;
+    seuil=1;
 
     tailleMiniBloc=footerWidth/2;
     nbFooters=0;
@@ -88,19 +88,19 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
     int leftPos=0, rightPos=0; //Position extrème des pixels du bloc.
     bloc*currentBloc;
     bool ajoutBloc;//booléen qui teste si on a réussit a ajouter la ligne de pixels non noir a un bloc.
-    //cout<<"-----------------------------------"<<endl;//nouvelle image
+    cout<<"-----------------------------------"<<endl;//nouvelle image
 
 
     //---->début du traitement
     //on met tout le blocs qui existent déjà comme mort.
     //Si on ajoute une ligne au bloc alors on lui enlève son status de mort, sinon on le supprime.
-    //cout<<"theBlocks :"<<endl;
+    cout<<"theBlocks :"<<endl;
     for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
     {
         (*it)->setDead(true);
-        //(*it)->toString();    //affichage de touts les blocs du vecteur (pour vérif)
+        (*it)->toString();    //affichage de touts les blocs du vecteur (pour vérif)
     }
-    //cout<<"*****************"<<endl;
+    cout<<"*****************"<<endl;
     //on accède aux valeurs de pixels
     bool debutSeuil=false;
     for(int i = 0;i < imageSansFond.cols;i++){
@@ -131,7 +131,7 @@ void Ligne::detectionDesBlocs(Mat imageSansFond)
             intensity.val[1]=255;
             rightPos=i-1;
             ajoutBloc=false;
-            //cout<<i<<" ["<<leftPos<<","<<rightPos<<"] "<<(rightPos-leftPos)<<endl;                      
+            cout<<" ["<<leftPos<<","<<rightPos<<"] "<<"w :"<<(rightPos-leftPos)<<endl;
             //on vérifie dans le vecteur des blocs si on peut ajouter ce bloc.
             for(vector<bloc*>::iterator it = theBlocs.begin(); it != theBlocs.end(); it++)
             {
@@ -171,8 +171,10 @@ int Ligne::getNbFooters()
 //on fait le ménage dans les blocs (on supprime les blocs morts)
 int Ligne::cleanTheBlocs()
 {
+    cout<<"clean **********************"<<endl;
     int newfooters=0;
     for(int i=0; i<theBlocs.size();i++)
+    //for(int i=theBlocs.size();i>-1;i--)
     {
         if (theBlocs[i]->checkDead())
         {

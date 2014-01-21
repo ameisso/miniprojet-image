@@ -13,6 +13,7 @@ bloc::bloc(int leftPos_, int rightPos_, int footerWidth_, int footerHeight_)
     blocHeight=1;
     dead=false;
     nbFooters=0;
+    nbDead=2;//on s'autorise une ligne sans rien ajouter au bloc avant de le supprimer.
 }
 
 //Fonction qui prend en paramètre les position des valeurs non noires de la matrice "extractedLineNoBackground" et qui vérifie si elle appartient a ce bloc.
@@ -31,6 +32,7 @@ bool bloc::checkNewLine(int leftPos, int rightPos)
         lastLeftPos=leftPos;
         lastRightPos=rightPos;
         dead=false;//on a pu ajouter une ligne au bloc, donc il n'est pas mort.
+
         return true;
     }
     else
@@ -38,17 +40,19 @@ bool bloc::checkNewLine(int leftPos, int rightPos)
         return false;
     }
 }
-//Fonction qui calcule le nombre de personnes dans le bloc et incrémente le ur.
+//Fonction qui calcule le nombre de personnes dans le bloc et incrémente le compteur.
 void bloc::deadBloc()
 {
-    int nbFooterInWidth=round((float)maxBlocWidth/(float)footerWidth);
-    int nbFooterInHeight=round((float)blocHeight/(float)footerHeight);
-
+   //int nbFooterInWidth=round((float)maxBlocWidth/(float)footerWidth);
+   //int nbFooterInHeight=round((float)blocHeight/(float)footerHeight);
+    int nbFooterInWidth=maxBlocWidth/footerWidth;
+    int nbFooterInHeight=blocHeight/footerHeight;
     if(nbFooterInHeight != 0 && nbFooterInWidth != 0)
     {
         nbFooters=nbFooterInWidth;
-        cout<<nbFooterInWidth<<" piétons comptés dans le bloc";
-        toString();
+        //toString();
+        cout<<"["<<lastLeftPos<<","<<lastRightPos<<"] h :"<<blocHeight<<", w :"<<maxBlocWidth<<"-->"<<nbFooterInWidth<<" piétons comptés dans le bloc dont "<<nbFooterInWidth<<" dans la largeur et "<<nbFooterInHeight <<" dans la hauteur."<<endl;
+
     }
 }
 
@@ -58,12 +62,16 @@ int bloc::getNbFooters()
 }
 void bloc::toString()
 {
-    cout<<"["<<lastLeftPos<<","<<lastRightPos<<"] h :"<<blocHeight<<", w :"<<maxBlocWidth<<endl;
+    cout<<"["<<lastLeftPos<<","<<lastRightPos<<"] h :"<<blocHeight<<", w :"<<maxBlocWidth<<" nbDead :"<<nbDead<<endl;
 }
 bool bloc::checkDead()
 {
-    if (dead==true)
-        //cout<<" deleted ["<<lastLeftPos<<","<<lastRightPos<<"]"<<endl;
+    //toString();
+    if (dead==true && nbDead!=0)
+    {
+        nbDead--;
+        dead=false;
+    }
     return dead;
 }
 void bloc::setDead(bool val)

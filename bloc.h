@@ -19,6 +19,7 @@ private:
     int nbFooters;//nombre de piétons dans le bloc (0 de base, mis a jour a l'appel de deadBloc)
     int maxBlocWidth;
     bool dead;//true si le bloc est mort.
+    int nbDead;//nombre de lignes ou l'on ajoute rien au bloc avant de le supprimer.
 public:
     bloc(int leftPos_, int rightPos_, int footerWidth_, int footerHeight_);
 
@@ -32,6 +33,8 @@ public:
     void setDead(bool val);
     void deadBloc();
     bool checkDuplicate(bloc *testedBloc);
+
+
 };
 
 #endif // BLOC_H
