@@ -10,14 +10,6 @@ using namespace cv;
 
 class Ligne
 {
-private:
-    // Definir la taille d'un pieton. C'est la meme valeur pour tous le blocs sur une ligne
-    int footerWidth;
-    int footerHeight;
-
-    unsigned char seuil;//valeurs au dessus desquelles on détecte un bloc.
-    int tailleMiniBloc;//taille en dessous de laquelle on analyse pas le bloc.
-    vector<bloc*> theBlocs;//vecteur de pointeurs vers les blocs
 public:
     //Ligne();
     Ligne(int nrLigne, Point P1, Point P2);
@@ -31,6 +23,9 @@ public:
     //   int nbFooters() const {return nbFooter;}
     void setfooterWidth(int width);
     void setfooterHeight(int height);
+    void setBgLearningRate(double bgLR);
+    void setBgThreshold(int bgThresh);
+    void setDetectionThreshold(int detThresh);
 
     const Mat& getData() const { return Data; }
 
@@ -43,10 +38,18 @@ private:
     Point P1, P2;
     Mat Data;
     BackgroundSubtractorAvg bgSubtractor;
-    int nbFooters;
+    double bgLearningRate; //Learning rate pour la soustraction de fond
 
+    int nbFooters;
     int nrLigne;
 
+    // Definir la taille d'un pieton. C'est la meme valeur pour tous le blocs sur une ligne
+    int footerWidth;
+    int footerHeight;
+
+    unsigned char seuil;//valeurs au dessus desquelles on détecte un bloc.
+    int tailleMiniBloc;//taille en dessous de laquelle on analyse pas le bloc.
+    vector<bloc*> theBlocs;//vecteur de pointeurs vers les blocs
 };
 
 #endif // LIGNE_H

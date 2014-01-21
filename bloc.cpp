@@ -41,16 +41,17 @@ bool bloc::checkNewLine(int leftPos, int rightPos)
 //Fonction qui calcule le nombre de personnes dans le bloc et incrémente le ur.
 void bloc::deadBloc()
 {
-    int nbFooterInWidth=maxBlocWidth/footerWidth;
-    int nbFooterInHeight=blocHeight/footerHeight;
+    int nbFooterInWidth=round((float)maxBlocWidth/(float)footerWidth);
+    int nbFooterInHeight=round((float)blocHeight/(float)footerHeight);
 
-    if(nbFooterInHeight!=0 && nbFooterInWidth!=0)
+    if(nbFooterInHeight != 0 && nbFooterInWidth != 0)
     {
-    nbFooters=nbFooterInWidth+nbFooterInHeight;
-    cout<<nbFooterInWidth<<"+"<<nbFooterInHeight<<"piétons comptés dans le bloc";
-    toString();
+        nbFooters=nbFooterInWidth;
+        cout<<nbFooterInWidth<<" piétons comptés dans le bloc";
+        toString();
     }
 }
+
 int bloc::getNbFooters()
 {
     return nbFooters;
@@ -72,7 +73,7 @@ void bloc::setDead(bool val)
 //Fonction qui renvoie true si un bloc est équivalent au bloc testé
 bool bloc::checkDuplicate  (bloc *testedBloc)
 {
-    if ((testedBloc->lastRightPos=lastRightPos) && (testedBloc->lastLeftPos==lastLeftPos))
+    if ((testedBloc->lastRightPos==lastRightPos) && (testedBloc->lastLeftPos==lastLeftPos))
     {
         //cout<<"equivalent bloc found ["<<lastLeftPos<<","<<lastRightPos<<"]"<<endl;
         //on copie les plus grandes valeurs dans ce bloc.
